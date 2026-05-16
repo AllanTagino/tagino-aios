@@ -105,21 +105,10 @@ versiona no GitHub, fica tudo seu.
 
 ---
 
-## Entrevista standalone (pra clientes que não usam Claude)
+## Entrevista web pra cliente que não usa Claude
 
-Se você atende cliente que não vai instalar o Claude Code, o sistema vem
-com uma entrevista web autônoma — `saidas/instalar-entrevista.html` (fonte)
-e `web/` (versão de deploy).
+Tagino_IOS é o sistema operacional pra quem **vai usar Claude Code**. Pra atender clientes que **não vão usar Claude**, montei uma entrevista web separada que roda em qualquer browser e captura as respostas via Netlify Forms:
 
-Fluxo:
+→ Repo do hub: **[tagino-entrevista-hub](https://github.com/AllanTagino/tagino-entrevista-hub)** (privado, é o meu setup)
 
-1. Você cria pasta da cliente no Google Drive, anota a URL
-2. Edita o mapa `CLIENTES` no topo do `web/index.html` adicionando o nome dela + URL da pasta
-3. Deploya no Netlify (free tier basta — `netlify deploy --prod --dir web`)
-4. Ativa Forms no painel do Netlify (Settings → Forms → desativa "Block submissions" se vier ligado)
-5. Manda pra ela: `https://seu-site.netlify.app/?cliente=Nome`
-6. Ela preenche, dados vão pra Netlify Forms automaticamente
-7. Você puxa pelo painel ou via API quando quiser
-
-O `scripts/deploy-web.ps1` automatiza o passo 3 — basta setar
-`$env:TAGINO_NETLIFY_SITE_ID` com o ID do site dela.
+Pra quem quiser montar uma própria, o hub é um único `public/index.html` + `deploy.ps1` no Netlify. Clone, customize o `CLIENTES` map, deploya.
