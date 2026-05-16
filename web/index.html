@@ -1,0 +1,856 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tagino_IOS — Entrevista de instalação</title>
+<style>
+  :root{
+    --bg:#F6F1E7;
+    --ink:#1A1A1A;
+    --muted:#6B665D;
+    --line:#E3DCCB;
+    --accent:#D9542B;
+    --accent-soft:#FCE9DF;
+    --ok:#3C7A4E;
+    --card:#FFFFFF;
+    --radius:14px;
+    --shadow:0 2px 0 rgba(0,0,0,.04), 0 30px 60px -30px rgba(26,26,26,.18);
+    font-synthesis: none;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    font-size:16px;
+    line-height:1.5;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 20px 80px;
+  }
+  .wrap{width:100%;max-width:720px}
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    margin-bottom:28px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+    font-weight:600;letter-spacing:.02em;
+  }
+  .brand-dot{
+    width:10px;height:10px;background:var(--accent);border-radius:50%;
+    box-shadow:0 0 0 4px var(--accent-soft);
+  }
+  .brand small{
+    color:var(--muted);font-weight:500;margin-left:6px;
+  }
+  .brand .cliente-chip{
+    margin-left:10px;background:var(--ink);color:#FFF;
+    padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+  .drive-card{
+    margin-top:18px;padding:14px 16px;border:1px solid var(--line);
+    border-radius:12px;background:#FBF8F1;display:flex;align-items:center;
+    justify-content:space-between;gap:14px;flex-wrap:wrap;
+  }
+  .drive-card .label{color:var(--muted);font-size:13px;margin-bottom:2px}
+  .drive-card .name{font-weight:600}
+  .drive-card a.btn-accent{text-decoration:none;color:#FFF}
+  .submit-state{
+    margin-top:18px;padding:14px 16px;border:1px solid var(--line);
+    border-radius:12px;background:#FBF8F1;display:flex;align-items:center;
+    gap:10px;font-size:14px;
+  }
+  .submit-state .dot{
+    width:10px;height:10px;border-radius:50%;background:var(--accent);
+    animation:pulse 1.4s ease-in-out infinite;
+  }
+  .submit-state.ok{background:#EAF5EC;border-color:#BCD8C1;color:#2B5C39}
+  .submit-state.fail{background:#FBEAEA;border-color:#E2BFBF;color:#7A2B2B}
+  .submit-state.ok .dot,.submit-state.fail .dot{animation:none}
+  .submit-state.ok .dot{background:var(--ok)}
+  .submit-state.fail .dot{background:#C04040}
+  @keyframes pulse{
+    0%,100%{opacity:.35}
+    50%{opacity:1}
+  }
+  .progress{
+    flex:1;max-width:280px;margin-left:24px;
+    height:6px;background:var(--line);border-radius:99px;overflow:hidden;
+  }
+  .progress > span{
+    display:block;height:100%;width:0%;background:var(--accent);
+    transition:width .3s ease;
+  }
+  .step-count{
+    color:var(--muted);font-size:13px;margin-left:10px;white-space:nowrap;
+  }
+  .saved-at{
+    color:var(--ok);font-size:12px;margin-left:10px;white-space:nowrap;
+    opacity:0;transition:opacity .25s;
+  }
+  .saved-at.visible{opacity:1}
+  .resume-banner{
+    background:#FFF7E6;border:1px solid #F0D89B;color:#6B4F00;
+    padding:12px 16px;border-radius:10px;margin-bottom:18px;
+    display:flex;align-items:center;justify-content:space-between;gap:14px;
+    font-size:14px;
+  }
+  .resume-banner button{
+    padding:6px 12px;font-size:13px;border-radius:8px;font-weight:600;
+    border:1px solid var(--line);background:#FFF;cursor:pointer;
+  }
+  .resume-banner .btn-resume{background:var(--ink);color:#FFF;border-color:var(--ink)}
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:36px 36px 28px;
+  }
+  .eyebrow{
+    color:var(--muted);font-size:13px;letter-spacing:.06em;
+    text-transform:uppercase;margin-bottom:10px;
+  }
+  h1{
+    font-size:30px;line-height:1.2;margin:0 0 6px;letter-spacing:-.01em;
+  }
+  h2{
+    font-size:24px;line-height:1.25;margin:0 0 8px;letter-spacing:-.01em;
+  }
+  .hint{
+    color:var(--muted);font-size:15px;margin:0 0 22px;
+  }
+  .field{margin-top:18px}
+  label{display:block;font-weight:600;margin-bottom:8px;font-size:15px}
+  input[type=text], textarea, select{
+    width:100%;font:inherit;color:inherit;background:#FFF;
+    border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;outline:none;transition:border-color .15s, box-shadow .15s;
+  }
+  input[type=text]:focus, textarea:focus, select:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px var(--accent-soft);
+  }
+  textarea{min-height:120px;resize:vertical}
+  .choices{display:grid;gap:10px;margin-top:8px}
+  .choice{
+    display:flex;align-items:flex-start;gap:12px;cursor:pointer;
+    border:1px solid var(--line);background:#FFF;padding:14px 16px;border-radius:12px;
+    transition:border-color .15s, background .15s, transform .05s;
+  }
+  .choice:hover{border-color:#C9C2AF}
+  .choice input{accent-color:var(--accent);margin-top:3px}
+  .choice .c-title{font-weight:600;margin-bottom:2px}
+  .choice .c-desc{color:var(--muted);font-size:14px}
+  .choice.selected{
+    border-color:var(--accent);background:var(--accent-soft);
+  }
+  .actions{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:28px;gap:12px;
+  }
+  button{
+    font:inherit;cursor:pointer;border-radius:10px;
+    padding:12px 22px;font-weight:600;border:1px solid transparent;
+    transition:transform .05s, background .15s, border-color .15s;
+  }
+  button:active{transform:translateY(1px)}
+  .btn-primary{background:var(--ink);color:#FFF}
+  .btn-primary:hover{background:#000}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--ink)}
+  .btn-ghost:hover{border-color:#C9C2AF;background:#FFFCF6}
+  .btn-accent{background:var(--accent);color:#FFF}
+  .btn-accent:hover{background:#B9431F}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap}
+  .footer-note{
+    color:var(--muted);font-size:13px;margin-top:18px;text-align:center;
+  }
+  .review{margin-top:14px}
+  .review .row{
+    display:flex;gap:14px;align-items:flex-start;padding:10px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .review .row:last-child{border-bottom:none}
+  .review .k{color:var(--muted);min-width:160px;font-size:14px;padding-top:1px}
+  .review .v{flex:1;white-space:pre-wrap;word-break:break-word}
+  .copybox{position:relative}
+  .copybox textarea{
+    font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+    font-size:13px;line-height:1.55;min-height:280px;
+    background:#FBF8F1;
+  }
+  .copy-btn{
+    position:absolute;top:8px;right:8px;
+    background:#FFF;border:1px solid var(--line);color:var(--ink);
+    padding:6px 10px;font-size:13px;border-radius:8px;
+  }
+  .copy-btn.copied{background:var(--ok);color:#FFF;border-color:var(--ok)}
+  .check{
+    display:inline-flex;align-items:center;gap:8px;color:var(--ok);
+    font-weight:600;margin-bottom:6px;
+  }
+  .check::before{
+    content:"";width:18px;height:18px;border-radius:50%;
+    background:var(--ok);
+    -webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='white' d='M9 16.2l-3.5-3.5 1.4-1.4L9 13.4l7.1-7.1 1.4 1.4z'/></svg>") center/16px no-repeat;
+            mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='white' d='M9 16.2l-3.5-3.5 1.4-1.4L9 13.4l7.1-7.1 1.4 1.4z'/></svg>") center/16px no-repeat;
+  }
+  .pill{
+    display:inline-block;background:var(--accent-soft);color:#8B3A1A;
+    padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;
+    letter-spacing:.04em;text-transform:uppercase;
+  }
+  .skip-link{
+    background:none;border:none;color:var(--muted);
+    text-decoration:underline;padding:0;cursor:pointer;font-size:14px;
+  }
+  .skip-link:hover{color:var(--ink)}
+  .tabs{display:flex;gap:6px;margin-bottom:10px}
+  .tab{
+    padding:6px 12px;border-radius:99px;font-size:13px;
+    background:#FFF;border:1px solid var(--line);cursor:pointer;color:var(--muted);
+  }
+  .tab.active{background:var(--ink);color:#FFF;border-color:var(--ink)}
+  @media (max-width:640px){
+    body{padding:18px 14px 60px}
+    .card{padding:24px 20px 20px}
+    h1{font-size:24px}
+    h2{font-size:20px}
+    header{flex-wrap:wrap;gap:10px}
+    .progress{max-width:none;margin-left:0;flex-basis:100%}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <span class="brand-dot"></span>
+      Tagino_IOS <small>· instalação</small><span id="brandCliente"></span>
+    </div>
+    <div class="progress" aria-hidden="true"><span id="bar"></span></div>
+    <div class="step-count" id="stepCount">1 / 11</div>
+    <div class="saved-at" id="savedAt" title="Salvo só no seu navegador"></div>
+  </header>
+
+  <main class="card" id="card">
+    <!-- Telas renderizadas via JS -->
+  </main>
+
+  <p class="footer-note">
+    Suas respostas ficam no teu navegador. No fim, são enviadas pro Allan automaticamente.
+  </p>
+
+</div>
+
+<!-- Form estático pro Netlify detectar (não é renderizado) -->
+<form name="entrevista-instalar" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="entrevista-instalar">
+  <input type="text" name="bot-field">
+  <input type="text" name="cliente">
+  <input type="text" name="perfil">
+  <input type="text" name="q1">
+  <textarea name="q2"></textarea>
+  <textarea name="q3"></textarea>
+  <textarea name="q4"></textarea>
+  <textarea name="q5"></textarea>
+  <textarea name="q6"></textarea>
+  <textarea name="q7"></textarea>
+  <textarea name="q8"></textarea>
+  <textarea name="q9"></textarea>
+  <textarea name="q10"></textarea>
+  <textarea name="markdown"></textarea>
+  <input type="hidden" name="timestamp">
+  <input type="hidden" name="origem">
+</form>
+
+<script>
+// Mapa cliente → pasta no Google Drive
+// Adicione clientes aqui ANTES de mandar o link `?cliente=Nome` pra eles.
+// Sem entrada aqui, o form ainda funciona (Netlify Forms captura tudo), mas
+// não mostra o chip com o nome no header nem o card de upload da pasta.
+//
+// Ex:
+//   "MariaSilva": {
+//     nome: "Maria Silva",
+//     driveUrl:    "https://drive.google.com/drive/folders/XXX",
+//     materiaisUrl:"https://drive.google.com/drive/folders/YYY"
+//   }
+const CLIENTES = {
+  // Adicione clientes aqui
+};
+
+// Lê ?cliente=Liege da URL
+const urlParams = new URLSearchParams(window.location.search);
+const clienteParam = urlParams.get("cliente") || "";
+const CLIENTE = CLIENTES[clienteParam] || (clienteParam ? {nome:clienteParam,driveUrl:""} : null);
+
+const _STATE = {
+  cliente: CLIENTE ? CLIENTE.nome : "",
+  perfil: "",
+  q1: "", // nome do negócio
+  q2: "", // o que entrega
+  q3: "", // quem te paga
+  q4: "", // equipe
+  q5: "", // exemplo de escrita
+  q6: "", // o que dá ranço
+  q7: "", // gargalo
+  q8: "", // o que tirar das costas
+  q9: "", // identidade visual (cores/fonte)
+  q10: "", // logo
+};
+
+// === Progressão local (localStorage) ===
+const STORAGE_KEY = `tagino_ios_entrevista_${(CLIENTE && CLIENTE.nome) || "generic"}`;
+let lastSavedAt = null;
+let savedAtTimer = null;
+
+function persistState(){
+  try{
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      state: _STATE,
+      step: stepIndex,
+      updatedAt: new Date().toISOString()
+    }));
+    lastSavedAt = new Date();
+    flashSavedIndicator();
+  }catch(e){ /* sem espaço, modo privado, etc — ignora */ }
+}
+
+function readPersisted(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){ return null; }
+}
+
+function clearPersisted(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+}
+
+function hasMeaningfulProgress(saved){
+  if(!saved || !saved.state) return false;
+  const s = saved.state;
+  return s.perfil || s.q1 || s.q2 || s.q3 || s.q4 || s.q5 || s.q6 || s.q7 || s.q8 || s.q9 || s.q10;
+}
+
+function flashSavedIndicator(){
+  const el = document.getElementById("savedAt");
+  if(!el) return;
+  el.textContent = "salvo ✓";
+  el.classList.add("visible");
+  clearTimeout(savedAtTimer);
+  savedAtTimer = setTimeout(()=>{
+    el.classList.remove("visible");
+  }, 1800);
+}
+
+// Proxy: qualquer STATE.x = y auto-persiste
+const STATE = new Proxy(_STATE, {
+  set(target, key, value){
+    target[key] = value;
+    persistState();
+    return true;
+  }
+});
+
+const PROFIS = [
+  {id:"solopreneur", titulo:"Solopreneur / criador solo", desc:"Uma pessoa só, mistura marca pessoal e negócio."},
+  {id:"freelancer",  titulo:"Freelancer",                 desc:"Atende clientes, organiza por projeto ou cliente."},
+  {id:"agencia",     titulo:"Agência / consultoria",      desc:"Equipe pequena entregando pra vários clientes."},
+  {id:"empresa",     titulo:"Empresa",                    desc:"Empresa estabelecida com setores (marketing, comercial, etc.)."}
+];
+
+const STEPS = [
+  {key:"intro", render:renderIntro},
+  {key:"perfil", render:renderPerfil, label:"Perfil"},
+  {key:"q1",  render:renderTexto("Como você chama o que você faz?",
+                "Nome da empresa, ou seu nome se for marca pessoal.","q1", false, "Ex: Tagino Studio, Allan Tagino, Acme Marketing…")},
+  {key:"q2",  render:renderTexto("O que sua empresa entrega — em uma frase?",
+                "Do jeito que você falaria pro vizinho. Sem buzzword.","q2", true, "Ex: Faço closet planejado pra apartamento de classe média alta em BH.")},
+  {key:"q3",  render:renderTexto("Quem te paga?",
+                "Perfil de cliente real — descreve em uma ou duas frases, sem persona genérica.","q3", true, "Ex: Casais 35-50, primeiro apartamento na planta, renda 25k+, valorizam acabamento.")},
+  {key:"q4",  render:renderTexto("Você toca sozinho ou tem equipe?",
+                "Se tem, quantos e cada um fazendo o quê.","q4", true, "Ex: Eu + 1 designer (proposta/render) + 1 marceneiro terceirizado.")},
+  {key:"q5",  render:renderTexto("Cola um exemplo da tua escrita.",
+                "Uma legenda do Insta, email pra cliente, qualquer coisa real e recente. Assim eu calibro o jeito de escrever sem adivinhar.","q5", true, "Cola o trecho aqui…")},
+  {key:"q6",  render:renderTexto("O que te dá ranço quando alguém escreve assim?",
+                "Ex: 'vamos juntos!', emoji em email formal, 'caro cliente', jargão de guru, 'alavancar', 'sinergia'.","q6", true, "Lista o que não suporta…")},
+  {key:"q7",  render:renderTexto("Qual o gargalo do teu negócio hoje?",
+                "O que tá segurando ele de crescer.","q7", true, "Ex: Demora 4 dias pra fechar proposta, perco lead pra concorrente mais rápido.")},
+  {key:"q8",  render:renderTexto("Se eu pudesse tirar UMA coisa que você repete toda semana das tuas costas, qual seria?",
+                "Uma tarefa específica. Quanto mais concreta, melhor.","q8", true, "Ex: Responder avaliações do Google. Toda semana junta umas 8.")},
+  {key:"q9",  render:renderTexto("Tem identidade visual definida?",
+                "Se tem, me passa as cores principais e a fonte. Se tiver paleta/manual em PDF/PNG, joga na pasta de materiais aqui embaixo.","q9", true, "Ex: Cores #1A1A1A e #D9542B, fonte Inter. Ou: zero.", uploadCard())},
+  {key:"q10", render:renderTexto("Tem logo?",
+                "Se sim, joga o arquivo de logo na pasta de materiais e confirma aqui (ex: \"subi logo.svg\"). Se não tem, escreve \"não tem\".","q10", true, "Ex: Subi logo.svg na pasta. Ou: não tem.", uploadCard())},
+  {key:"fim", render:renderFim}
+];
+
+let stepIndex = 0;
+
+const card = document.getElementById("card");
+const bar = document.getElementById("bar");
+const stepCount = document.getElementById("stepCount");
+
+// Renderiza chip do cliente no header
+if (CLIENTE) {
+  document.getElementById("brandCliente").innerHTML =
+    `<span class="cliente-chip">cliente · ${escapeHtmlEarly(CLIENTE.nome)}</span>`;
+}
+function escapeHtmlEarly(s){
+  return (s||"").replace(/[&<>"]/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[m]));
+}
+
+function updateProgress(){
+  const total = STEPS.length;
+  const pct = Math.round((stepIndex) / (total - 1) * 100);
+  bar.style.width = pct + "%";
+  stepCount.textContent = (stepIndex + 1) + " / " + total;
+}
+
+function go(delta){
+  const next = stepIndex + delta;
+  if(next < 0 || next >= STEPS.length) return;
+  stepIndex = next;
+  persistState();
+  render();
+}
+
+function render(){
+  card.innerHTML = "";
+  STEPS[stepIndex].render(card);
+  updateProgress();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+// --- Telas ---
+
+function renderIntro(root){
+  const ola = CLIENTE ? `Oi, ${escapeHtml(CLIENTE.nome)}.` : "Vamos instalar o Tagino_IOS no teu negócio.";
+  const sub = CLIENTE
+    ? `Sou o sistema do Allan. Pra ele te atender direito, preciso te conhecer primeiro. 10 perguntas, 5–7 minutos. Sem firula. Pode pausar e voltar quando quiser — o navegador guarda seu progresso.`
+    : `10 perguntas. 5-7 minutos. Sem firula. No fim, você copia o resumo e cola na conversa com a Claude — ela preenche a memória do sistema e tá pronto.`;
+
+  const saved = readPersisted();
+  const podeRetomar = hasMeaningfulProgress(saved);
+  const quando = podeRetomar ? humanizaQuando(saved.updatedAt) : null;
+
+  const banner = podeRetomar ? `
+    <div class="resume-banner">
+      <div>Tem progresso salvo aqui ${quando ? `(${quando})` : ""}. Quer continuar de onde parou?</div>
+      <div style="display:flex;gap:8px">
+        <button id="resume" class="btn-resume">Continuar</button>
+        <button id="discard">Recomeçar</button>
+      </div>
+    </div>` : "";
+
+  root.innerHTML = `
+    ${banner}
+    <span class="pill">setup inicial</span>
+    <h1 style="margin-top:12px">${ola}</h1>
+    <p class="hint">${sub}</p>
+    <div class="actions" style="justify-content:flex-end">
+      <button class="btn-primary" id="next">${podeRetomar ? "Começar do zero" : "Começar"}</button>
+    </div>
+  `;
+  document.getElementById("next").onclick = ()=>{
+    if(podeRetomar && !confirm("Isso apaga o progresso salvo. Confirma?")) return;
+    clearPersisted();
+    resetState();
+    go(1);
+  };
+  if(podeRetomar){
+    document.getElementById("resume").onclick = ()=>{
+      Object.assign(_STATE, saved.state);
+      stepIndex = Math.max(1, saved.step || 1);
+      render();
+    };
+    document.getElementById("discard").onclick = ()=>{
+      if(!confirm("Apagar o progresso salvo?")) return;
+      clearPersisted();
+      render();
+    };
+  }
+}
+
+function humanizaQuando(iso){
+  if(!iso) return "";
+  const diff = Date.now() - new Date(iso).getTime();
+  const min = Math.round(diff / 60000);
+  if(min < 1) return "agora há pouco";
+  if(min < 60) return `há ${min} min`;
+  const h = Math.round(min / 60);
+  if(h < 24) return `há ${h}h`;
+  const d = Math.round(h / 24);
+  return `há ${d} ${d === 1 ? "dia" : "dias"}`;
+}
+
+function resetState(){
+  Object.keys(_STATE).forEach(k=>{ _STATE[k] = ""; });
+  _STATE.cliente = CLIENTE ? CLIENTE.nome : "";
+}
+
+function renderPerfil(root){
+  root.innerHTML = `
+    <div class="eyebrow">Fase 1 · Perfil</div>
+    <h2>Qual desses combina mais com o teu negócio?</h2>
+    <p class="hint">Isso define o template de organização das pastas.</p>
+    <div class="choices" id="perfis"></div>
+    <div class="actions">
+      <button class="btn-ghost" id="back">Voltar</button>
+      <button class="btn-primary" id="next" ${STATE.perfil?"":"disabled style='opacity:.45;cursor:not-allowed'"}>Próximo</button>
+    </div>
+  `;
+  const list = document.getElementById("perfis");
+  PROFIS.forEach(p=>{
+    const sel = STATE.perfil === p.id;
+    const el = document.createElement("label");
+    el.className = "choice" + (sel?" selected":"");
+    el.innerHTML = `
+      <input type="radio" name="perfil" value="${p.id}" ${sel?"checked":""}>
+      <div>
+        <div class="c-title">${p.titulo}</div>
+        <div class="c-desc">${p.desc}</div>
+      </div>`;
+    el.querySelector("input").addEventListener("change",()=>{
+      STATE.perfil = p.id;
+      render();
+    });
+    list.appendChild(el);
+  });
+  document.getElementById("back").onclick = ()=>go(-1);
+  document.getElementById("next").onclick = ()=> STATE.perfil && go(1);
+}
+
+function uploadCard(){
+  if(!CLIENTE || !CLIENTE.materiaisUrl) return "";
+  return `
+    <div class="drive-card" style="margin-top:14px">
+      <div>
+        <div class="label">Tem arquivos pra mandar? Joga na pasta de materiais</div>
+        <div style="font-weight:600;margin-top:2px">Logo, paleta, manual de marca, referências…</div>
+      </div>
+      <a class="btn-accent" href="${CLIENTE.materiaisUrl}" target="_blank" rel="noopener">Abrir pasta</a>
+    </div>
+  `;
+}
+
+function renderTexto(titulo, hint, chave, multilinha, placeholder, extra=""){
+  return function(root){
+    const idx = STEPS.findIndex(s=>s.key===chave);
+    const fase = idx <= 5 ? "Sobre o negócio" : idx <= 7 ? "Sobre a voz" : idx <= 9 ? "Sobre o foco" : "Sobre a identidade visual";
+    const numero = idx - 1; // pula intro
+    root.innerHTML = `
+      <div class="eyebrow">Pergunta ${numero} · ${fase}</div>
+      <h2>${titulo}</h2>
+      <p class="hint">${hint}</p>
+      <div class="field">
+        ${multilinha
+          ? `<textarea id="inp" placeholder="${placeholder}">${escapeHtml(STATE[chave])}</textarea>`
+          : `<input type="text" id="inp" placeholder="${placeholder}" value="${escapeHtml(STATE[chave])}">`}
+      </div>
+      ${extra}
+      <div class="actions">
+        <button class="btn-ghost" id="back">Voltar</button>
+        <div class="btn-row">
+          <button class="skip-link" id="skip">pular</button>
+          <button class="btn-primary" id="next">Próximo</button>
+        </div>
+      </div>
+    `;
+    const inp = document.getElementById("inp");
+    inp.focus();
+    inp.addEventListener("input",()=> STATE[chave] = inp.value);
+    inp.addEventListener("keydown",(e)=>{
+      if(e.key==="Enter" && (!multilinha || (e.ctrlKey||e.metaKey))){
+        e.preventDefault();
+        STATE[chave] = inp.value;
+        go(1);
+      }
+    });
+    document.getElementById("back").onclick = ()=>{ STATE[chave]=inp.value; go(-1); };
+    document.getElementById("next").onclick = ()=>{ STATE[chave]=inp.value; go(1); };
+    document.getElementById("skip").onclick = ()=>{ STATE[chave]=""; go(1); };
+  };
+}
+
+function renderFim(root){
+  const md = buildMarkdown();
+  const json = JSON.stringify(buildJson(), null, 2);
+
+  const driveCard = (CLIENTE && CLIENTE.driveUrl) ? `
+    <div class="drive-card">
+      <div>
+        <div class="label">Pasta da ${escapeHtml(CLIENTE.nome)} no Google Drive</div>
+        <div class="name">Tagino_IOS - Clientes / ${escapeHtml(CLIENTE.nome)}</div>
+      </div>
+      <a class="btn-accent" href="${CLIENTE.driveUrl}" target="_blank" rel="noopener">Abrir pasta</a>
+    </div>
+  ` : "";
+
+  root.innerHTML = `
+    <div class="check">Pronto.</div>
+    <h2>${CLIENTE ? `Obrigado, ${escapeHtml(CLIENTE.nome)}. Suas respostas foram enviadas.` : "Cola isso na conversa com a Claude."}</h2>
+    <p class="hint">${CLIENTE
+      ? `Já não precisa fazer mais nada — o Allan recebe automaticamente. Se quiser também tem o resumo abaixo pra baixar ou copiar.`
+      : `Ela vai preencher os arquivos de memória do Tagino_IOS automaticamente. Você também pode baixar como arquivo.`}</p>
+
+    <div class="submit-state" id="submitState" aria-live="polite">
+      <span class="dot"></span><span>Preparando envio…</span>
+    </div>
+
+    ${driveCard}
+
+    <div class="tabs">
+      <button class="tab active" data-tab="md">Markdown (cola no chat)</button>
+      <button class="tab" data-tab="json">JSON (programático)</button>
+      <button class="tab" data-tab="review">Revisar respostas</button>
+    </div>
+
+    <div id="tab-md" class="copybox">
+      <textarea readonly id="ta-md">${escapeHtml(md)}</textarea>
+      <button class="copy-btn" data-target="ta-md">Copiar</button>
+    </div>
+
+    <div id="tab-json" class="copybox" style="display:none">
+      <textarea readonly id="ta-json">${escapeHtml(json)}</textarea>
+      <button class="copy-btn" data-target="ta-json">Copiar</button>
+    </div>
+
+    <div id="tab-review" class="review" style="display:none">
+      ${reviewRows()}
+    </div>
+
+    <div class="actions">
+      <button class="btn-ghost" id="back">Voltar e ajustar</button>
+      <div class="btn-row">
+        <button class="btn-ghost" id="dl-md">Baixar .md</button>
+        <button class="btn-ghost" id="dl-json">Baixar .json</button>
+        <button class="btn-accent" id="restart">Refazer do zero</button>
+      </div>
+    </div>
+  `;
+
+  document.querySelectorAll(".tab").forEach(t=>{
+    t.onclick = ()=>{
+      document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+      t.classList.add("active");
+      ["md","json","review"].forEach(k=>{
+        document.getElementById("tab-"+k).style.display = (t.dataset.tab===k)?"":"none";
+      });
+    };
+  });
+
+  document.querySelectorAll(".copy-btn").forEach(btn=>{
+    btn.onclick = async ()=>{
+      const ta = document.getElementById(btn.dataset.target);
+      try{
+        await navigator.clipboard.writeText(ta.value);
+      }catch(e){
+        ta.select(); document.execCommand("copy");
+      }
+      const old = btn.textContent;
+      btn.classList.add("copied");
+      btn.textContent = "Copiado ✓";
+      setTimeout(()=>{ btn.classList.remove("copied"); btn.textContent = old; }, 1600);
+    };
+  });
+
+  document.getElementById("back").onclick = ()=>go(-1);
+  document.getElementById("restart").onclick = ()=>{
+    if(confirm("Apaga tudo e recomeça?")){
+      clearPersisted();
+      resetState();
+      stepIndex = 0;
+      render();
+    }
+  };
+  const slug = (STATE.cliente || "instalar").toLowerCase()
+    .normalize("NFD").replace(/\p{Diacritic}/gu, "")
+    .replace(/[^a-z0-9]+/g,"-").replace(/(^-|-$)/g,"");
+  document.getElementById("dl-md").onclick = ()=>download(`respostas-${slug}.md`, md, "text/markdown");
+  document.getElementById("dl-json").onclick = ()=>download(`respostas-${slug}.json`, json, "application/json");
+
+  // Dispara envio automático pro Netlify Forms
+  autoSubmitOnFim();
+}
+
+function reviewRows(){
+  const rows = [
+    ["Perfil",      perfilLabel(STATE.perfil)],
+    ["Nome",        STATE.q1],
+    ["O que faz",   STATE.q2],
+    ["Cliente",     STATE.q3],
+    ["Equipe",      STATE.q4],
+    ["Voz (exemplo)", STATE.q5],
+    ["Ranço",       STATE.q6],
+    ["Gargalo",     STATE.q7],
+    ["Tirar das costas", STATE.q8],
+    ["Identidade",  STATE.q9],
+    ["Logo",        STATE.q10],
+  ];
+  return rows.map(([k,v])=>`<div class="row"><div class="k">${k}</div><div class="v">${escapeHtml(v||"—")}</div></div>`).join("");
+}
+
+function perfilLabel(id){
+  const p = PROFIS.find(x=>x.id===id);
+  return p ? p.titulo : "—";
+}
+
+function buildJson(){
+  return {
+    versao: 1,
+    timestamp: new Date().toISOString(),
+    cliente: STATE.cliente || null,
+    drive_url: (CLIENTE && CLIENTE.driveUrl) || null,
+    perfil: STATE.perfil,
+    negocio: {
+      nome: STATE.q1,
+      entrega: STATE.q2,
+      cliente: STATE.q3,
+      equipe: STATE.q4
+    },
+    voz: {
+      exemplo: STATE.q5,
+      ranco: STATE.q6
+    },
+    foco: {
+      gargalo: STATE.q7,
+      tirar_das_costas: STATE.q8
+    },
+    identidade: {
+      cores_fontes: STATE.q9,
+      logo: STATE.q10
+    }
+  };
+}
+
+function buildMarkdown(){
+  const L = perfilLabel(STATE.perfil);
+  const cab = STATE.cliente
+    ? `# Respostas /instalar — Tagino_IOS
+
+**Cliente:** ${STATE.cliente}
+**Perfil:** ${L || "—"}`
+    : `# Respostas /instalar — Tagino_IOS
+
+**Perfil:** ${L || "—"}`;
+  return `${cab}
+
+## Sobre o negócio
+1. Nome / como chama o que faz: ${STATE.q1 || "—"}
+2. O que entrega: ${STATE.q2 || "—"}
+3. Quem paga (cliente): ${STATE.q3 || "—"}
+4. Equipe: ${STATE.q4 || "—"}
+
+## Sobre a voz
+5. Exemplo da escrita:
+${STATE.q5 ? indent(STATE.q5) : "—"}
+
+6. O que dá ranço: ${STATE.q6 || "—"}
+
+## Sobre o foco
+7. Gargalo hoje: ${STATE.q7 || "—"}
+8. Pra tirar das costas (toda semana): ${STATE.q8 || "—"}
+
+## Identidade visual
+9. Cores / fontes: ${STATE.q9 || "—"}
+10. Logo: ${STATE.q10 || "—"}
+`;
+}
+
+function indent(s){
+  return s.split(/\r?\n/).map(l=>"> "+l).join("\n");
+}
+
+function escapeHtml(s){
+  return (s||"").replace(/[&<>"]/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;" }[m]));
+}
+
+// === Envio pra Netlify Forms ===
+const NETLIFY_FORM_NAME = "entrevista-instalar";
+
+function isLiveSite(){
+  return location.protocol === "https:" && location.hostname.endsWith("netlify.app");
+}
+
+async function submitToNetlify(){
+  const md = buildMarkdown();
+  const fields = {
+    "form-name": NETLIFY_FORM_NAME,
+    cliente:  STATE.cliente || "",
+    perfil:   STATE.perfil  || "",
+    q1: STATE.q1 || "", q2: STATE.q2 || "", q3: STATE.q3 || "",
+    q4: STATE.q4 || "", q5: STATE.q5 || "", q6: STATE.q6 || "",
+    q7: STATE.q7 || "", q8: STATE.q8 || "", q9: STATE.q9 || "",
+    q10: STATE.q10 || "",
+    markdown: md,
+    timestamp: new Date().toISOString(),
+    origem: location.href
+  };
+  const body = new URLSearchParams(fields).toString();
+  const resp = await fetch("/", {
+    method: "POST",
+    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+    body
+  });
+  if(!resp.ok) throw new Error(`Netlify retornou HTTP ${resp.status}`);
+  return true;
+}
+
+let _lastSubmissionTs = null;
+function autoSubmitOnFim(){
+  const wrap = document.getElementById("submitState");
+  if(!wrap) return;
+
+  if(!isLiveSite()){
+    wrap.className = "submit-state";
+    wrap.innerHTML = `<span class="dot" style="animation:none;background:#A09980"></span>
+      <span>Modo local (file://) — envio automático só funciona na URL do Netlify.
+      Use o markdown abaixo manualmente.</span>`;
+    return;
+  }
+
+  // Evita re-envio dentro de 30s (caso renderFim seja chamado várias vezes)
+  if(_lastSubmissionTs && (Date.now() - _lastSubmissionTs) < 30000){
+    wrap.className = "submit-state ok";
+    wrap.innerHTML = `<span class="dot"></span><span>Enviado pro Allan ✓</span>`;
+    return;
+  }
+
+  wrap.className = "submit-state";
+  wrap.innerHTML = `<span class="dot"></span><span>Enviando pro Allan…</span>`;
+
+  submitToNetlify()
+    .then(()=>{
+      _lastSubmissionTs = Date.now();
+      wrap.className = "submit-state ok";
+      wrap.innerHTML = `<span class="dot"></span>
+        <span><strong>Enviado pro Allan ✓</strong> — ele já recebeu suas respostas.</span>`;
+    })
+    .catch(err=>{
+      wrap.className = "submit-state fail";
+      wrap.innerHTML = `<span class="dot"></span>
+        <span><strong>Falhou o envio automático.</strong> Copia o markdown abaixo e manda pro Allan no WhatsApp. (${escapeHtml(String(err.message||err))})</span>`;
+    });
+}
+
+function download(name, content, mime){
+  const blob = new Blob([content], {type:mime});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href = url; a.download = name; a.click();
+  URL.revokeObjectURL(url);
+}
+
+render();
+</script>
+</body>
+</html>
