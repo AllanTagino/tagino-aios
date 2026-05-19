@@ -1,0 +1,1428 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tagino_IOS — Dashboard</title>
+<style>
+  /* ─────────── Tokens (neutros do OS; cores de projeto entram no widget Identidade) ─────────── */
+  :root {
+    --bg:        #F5F1E8;
+    --paper:    #FBF8F1;
+    --ink:       #15140F;
+    --ink-soft:  #4A4742;
+    --ink-mute:  #8A857B;
+    --line:      #E5DECC;
+    --line-soft: #EFEADC;
+    --accent:    #6B4A2F;     /* tinta — usado pra detalhe, não pra área */
+    --ok:        #4F6B3A;
+    --pend:      #B8852E;
+    --miss:      #B23A2A;
+    --radius: 4px;
+    --shadow: 0 1px 0 rgba(21,20,15,0.04), 0 0 0 1px var(--line);
+    --serif: ui-serif, 'Iowan Old Style', 'Georgia', 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.45;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 28px 64px; }
+
+  /* ─────────── Top bar ─────────── */
+  .topbar {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; padding-bottom: 22px; border-bottom: 1px solid var(--line);
+    margin-bottom: 28px;
+  }
+  .brand {
+    display: flex; align-items: baseline; gap: 14px;
+  }
+  .brand-mark {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .brand-mark .dot { color: var(--accent); }
+  .brand-sub {
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-mute);
+  }
+  .topbar-meta {
+    text-align: right;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: var(--ink-soft);
+  }
+  .topbar-meta strong { color: var(--ink); font-weight: 600; }
+
+  /* ─────────── Hero / status ─────────── */
+  .hero {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 28px 28px 24px;
+    margin-bottom: 28px;
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: 36px;
+  }
+  .hero-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 32px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 10px;
+  }
+  .hero-lead {
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+    max-width: 56ch;
+  }
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .stat {
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+  .stat-num {
+    font-family: var(--serif);
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .stat-lbl {
+    margin-top: 6px;
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+  }
+
+  .hero-progress {
+    align-self: start;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 18px 18px 16px;
+  }
+  .progress-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .progress-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-mute);
+  }
+  .progress-pct {
+    font-family: var(--serif); font-style: italic;
+    font-size: 28px; line-height: 1;
+  }
+  .progress-bar {
+    height: 4px; background: var(--line-soft); border-radius: 2px; overflow: hidden;
+  }
+  .progress-bar > span {
+    display: block; height: 100%;
+    background: var(--ink); width: 0; transition: width .6s ease;
+  }
+  .progress-list {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+  .progress-list li { display: flex; justify-content: space-between; align-items: center; }
+  .progress-list .tag { font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .tag-ok   { color: var(--ok); }
+  .tag-pend { color: var(--pend); }
+  .tag-miss { color: var(--miss); }
+
+  /* ─────────── Grid layout ─────────── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 20px;
+  }
+  .col-12 { grid-column: span 12; }
+  .col-8  { grid-column: span 8; }
+  .col-6  { grid-column: span 6; }
+  .col-4  { grid-column: span 4; }
+  @media (max-width: 980px) {
+    .col-8, .col-6, .col-4 { grid-column: span 12; }
+    .hero { grid-template-columns: 1fr; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ─────────── Card ─────────── */
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 22px 22px;
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .card-title {
+    margin: 0;
+    font-family: var(--serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    letter-spacing: -0.005em;
+  }
+  .card-kicker {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-mute);
+  }
+
+  /* ─────────── Memory file rows ─────────── */
+  .mem-row {
+    display: grid;
+    grid-template-columns: 24px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .mem-row:last-child { border-bottom: 0; }
+  .mem-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--ok);
+    box-shadow: 0 0 0 3px rgba(79,107,58,0.12);
+  }
+  .mem-dot.pend { background: var(--pend); box-shadow: 0 0 0 3px rgba(184,133,46,0.14); }
+  .mem-dot.miss { background: var(--miss); box-shadow: 0 0 0 3px rgba(178,58,42,0.12); }
+  .mem-file {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+  }
+  .mem-file .path { color: var(--ink-mute); }
+  .mem-meta {
+    font-size: 12px; color: var(--ink-soft);
+    margin-top: 2px;
+  }
+  .mem-badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 4px 8px;
+    border-radius: 99px;
+    background: rgba(79,107,58,0.10);
+    color: var(--ok);
+    white-space: nowrap;
+  }
+  .mem-badge.pend { background: rgba(184,133,46,0.12); color: var(--pend); }
+  .mem-badge.miss { background: rgba(178,58,42,0.10); color: var(--miss); }
+
+  /* ─────────── Identidade widget ─────────── */
+  .identity-banner {
+    background: #8FA37A;
+    color: #F2EDE4;
+    padding: 22px 22px 18px;
+    border-radius: var(--radius);
+    margin: -2px 0 16px;
+    position: relative;
+    overflow: hidden;
+  }
+  .identity-banner .id-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 28px;
+    line-height: 1;
+    margin: 0 0 4px;
+  }
+  .identity-banner .id-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    opacity: 0.85;
+  }
+  .id-pill {
+    position: absolute; top: 20px; right: 20px;
+    background: #0F0F0E; color: #fff;
+    font-family: var(--sans); font-weight: 600;
+    font-size: 11px; letter-spacing: 0.18em;
+    padding: 6px 14px; border-radius: 999px;
+  }
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .swatch {
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--line);
+  }
+  .swatch-color { height: 56px; }
+  .swatch-meta {
+    padding: 8px 10px;
+    background: #fff;
+    border-top: 1px solid var(--line-soft);
+  }
+  .swatch-name {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.10em;
+    color: var(--ink);
+  }
+  .swatch-hex {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-mute);
+    margin-top: 1px;
+  }
+  .type-rows {
+    display: grid;
+    gap: 10px;
+    padding-top: 6px;
+    border-top: 1px solid var(--line-soft);
+    margin-top: 4px;
+  }
+  .type-row {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 12px;
+    align-items: baseline;
+  }
+  .type-key {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+  }
+  .type-sample-serif {
+    font-family: var(--serif); font-style: italic; font-size: 22px; line-height: 1.05;
+  }
+  .type-sample-sans {
+    font-family: var(--sans); font-size: 13.5px; color: var(--ink-soft);
+  }
+
+  /* ─────────── Strategy widget ─────────── */
+  .strat-headline {
+    font-family: var(--serif); font-style: italic;
+    font-size: 22px; line-height: 1.25; margin: 0 0 14px;
+    letter-spacing: -0.005em;
+  }
+  .strat-target {
+    display: flex; align-items: baseline; justify-content: space-between;
+    padding: 14px 16px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+  }
+  .strat-target .num {
+    font-family: var(--serif); font-style: italic; font-size: 38px; line-height: 1;
+  }
+  .strat-target .lbl {
+    font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.14em; color: var(--ink-mute); text-align: right;
+  }
+  .frentes {
+    list-style: none;
+    padding: 0; margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+  .frente {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 13px;
+  }
+  .frente:last-child { border-bottom: 0; }
+  .frente .num {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    padding-top: 2px;
+  }
+  .frente strong { color: var(--ink); font-weight: 600; }
+  .frente span { color: var(--ink-soft); }
+
+  /* ─────────── Skills grid (scrollable) ─────────── */
+  .skills-scroll {
+    max-height: 420px;
+    overflow-y: auto;
+    padding-right: 6px;
+    margin-right: -6px;
+    /* scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+  .skills-scroll::-webkit-scrollbar { width: 8px; }
+  .skills-scroll::-webkit-scrollbar-track { background: transparent; }
+  .skills-scroll::-webkit-scrollbar-thumb {
+    background: var(--line);
+    border-radius: 99px;
+  }
+  .skills-scroll::-webkit-scrollbar-thumb:hover { background: var(--ink-mute); }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .skill {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 10px 12px 11px;
+    font-size: 12.5px;
+    display: flex; flex-direction: column; gap: 3px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    font-family: inherit;
+    transition: border-color .15s, background-color .15s, transform .1s;
+    position: relative;
+  }
+  .skill:hover {
+    border-color: var(--ink);
+    background: #fffdf6;
+  }
+  .skill:active { transform: scale(0.997); }
+  .skill::after {
+    content: "↗";
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: var(--ink-mute);
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity .15s;
+  }
+  .skill:hover::after { opacity: 1; }
+  .skill-name {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    padding-right: 18px;
+  }
+  .skill-desc { color: var(--ink-soft); font-size: 11.5px; line-height: 1.35; }
+  .skills-hint {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--line);
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+    text-align: center;
+  }
+
+  /* ─────────── Skill modal ─────────── */
+  .modal-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(21,20,15,0.42);
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 100;
+  }
+  .modal-backdrop.open { display: flex; }
+  .modal {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    max-width: 620px;
+    width: 100%;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 26px 28px 26px;
+    box-shadow: 0 12px 48px rgba(21,20,15,0.18);
+    position: relative;
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: #fff;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .modal-close:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .modal-kicker {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--ink-mute);
+    margin-bottom: 6px;
+  }
+  .modal-title {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 30px;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 40px 4px 0;
+  }
+  .modal-cmd {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+  }
+  .modal-section {
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+  }
+  .modal-section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-mute);
+    margin-bottom: 8px;
+  }
+  .modal-section p { margin: 0; color: var(--ink-soft); font-size: 13.5px; line-height: 1.5; }
+  .modal-examples {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 6px;
+  }
+  .modal-examples li {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    font-size: 12.5px;
+    color: var(--ink);
+  }
+  .modal-examples li::before {
+    content: "› ";
+    color: var(--accent);
+  }
+  .modal-meta {
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+  .modal-meta strong { color: var(--ink); font-weight: 600; }
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: var(--radius);
+    font-family: var(--mono);
+    font-size: 11.5px;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+    border: 1px solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-ghost {
+    background: #fff;
+    color: var(--ink);
+  }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* ─────────── Clickable rows (memória, produção) ─────────── */
+  a.row-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: background-color .15s;
+    border-radius: var(--radius);
+    margin: 0 -8px;
+    padding: 0 8px;
+  }
+  a.row-link:hover { background: #fffdf6; }
+  a.row-link:hover .out-name,
+  a.row-link:hover .mem-file { color: var(--accent); }
+
+  /* ─────────── Expandir o sistema ─────────── */
+  .expand-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  @media (max-width: 820px) { .expand-grid { grid-template-columns: 1fr; } }
+  .expand-col h3 {
+    margin: 0 0 12px;
+    font-family: var(--mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .mcp-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .mcp {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+  }
+  .mcp-name { font-family: var(--mono); font-size: 12.5px; color: var(--ink); }
+  .mcp-note { font-size: 11.5px; color: var(--ink-soft); margin-top: 2px; }
+  .mcp-status {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 3px 9px;
+    border-radius: 99px;
+    background: rgba(184,133,46,0.12);
+    color: var(--pend);
+  }
+  .mcp-status.connected {
+    background: rgba(79,107,58,0.10);
+    color: var(--ok);
+  }
+  .tpl-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .tpl {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 11px 14px;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color .15s, background-color .15s;
+  }
+  .tpl:hover {
+    border-color: var(--ink);
+    background: #fffdf6;
+  }
+  .tpl-path {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+    margin-bottom: 2px;
+  }
+  .tpl-title { font-size: 12.5px; color: var(--ink); }
+
+  /* ─────────── Output (saídas/marketing/site) ─────────── */
+  .out-row {
+    display: grid;
+    grid-template-columns: 90px 1fr auto;
+    gap: 14px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line-soft);
+    font-size: 13px;
+    align-items: center;
+  }
+  .out-row:last-child { border-bottom: 0; }
+  .out-type {
+    font-family: var(--mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--ink-mute);
+  }
+  .out-name { color: var(--ink); }
+  .out-name .path { color: var(--ink-mute); font-family: var(--mono); font-size: 11.5px; }
+  .out-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-mute);
+  }
+
+  /* ─────────── Next actions ─────────── */
+  .actions {
+    display: grid;
+    gap: 10px;
+  }
+  .action {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: center;
+  }
+  .action-text strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .action-text small {
+    display: block;
+    color: var(--ink-soft);
+    margin-top: 2px;
+    font-size: 12px;
+  }
+  .action-cmd {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    padding: 4px 10px;
+    border-radius: 99px;
+  }
+
+  /* ─────────── Footer ─────────── */
+  .foot {
+    margin-top: 32px;
+    padding-top: 18px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-mute);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    display: flex; justify-content: space-between; gap: 12px;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ────────── Top ────────── -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">Tagino_IOS<span class="dot">.</span></div>
+      <div class="brand-sub" id="brand-sub">— sistema operacional do negócio</div>
+    </div>
+    <div class="topbar-meta">
+      <div>Workspace · <strong id="ws-name">—</strong></div>
+      <div id="ws-meta">—</div>
+    </div>
+  </header>
+
+  <!-- ────────── Hero (resumo + barra) ────────── -->
+  <section class="hero">
+    <div>
+      <h1 class="hero-title" id="hero-title">—</h1>
+      <p class="hero-lead" id="hero-lead">—</p>
+      <div class="hero-stats" id="hero-stats"></div>
+    </div>
+    <div class="hero-progress">
+      <div class="progress-head">
+        <span class="progress-label">Instalação · setup</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar"><span id="progress-fill"></span></div>
+      <ul class="progress-list" id="progress-list"></ul>
+    </div>
+  </section>
+
+  <!-- ────────── Grid ────────── -->
+  <section class="grid">
+
+    <!-- Memória -->
+    <div class="card col-6">
+      <div class="card-head">
+        <h2 class="card-title">Memória</h2>
+        <span class="card-kicker">_memoria/</span>
+      </div>
+      <div id="memory-list"></div>
+    </div>
+
+    <!-- Identidade -->
+    <div class="card col-6">
+      <div class="card-head">
+        <h2 class="card-title">Identidade visual</h2>
+        <span class="card-kicker">identidade/design-guide.md</span>
+      </div>
+      <div class="identity-banner" id="id-banner">
+        <span class="id-pill" id="id-pill">LISBÔ</span>
+        <div class="id-title" id="id-title">lisbô<span style="color:#0F0F0E">.</span></div>
+        <div class="id-sub" id="id-sub">paleta · tipografia · espírito</div>
+      </div>
+      <div class="swatches" id="swatches"></div>
+      <div class="type-rows" id="type-rows"></div>
+    </div>
+
+    <!-- Estratégia -->
+    <div class="card col-8">
+      <div class="card-head">
+        <h2 class="card-title">Foco atual</h2>
+        <span class="card-kicker">_memoria/estrategia.md</span>
+      </div>
+      <p class="strat-headline" id="strat-headline">—</p>
+      <div class="strat-target">
+        <div class="num" id="strat-target-num">—</div>
+        <div class="lbl" id="strat-target-lbl">—</div>
+      </div>
+      <ul class="frentes" id="frentes"></ul>
+    </div>
+
+    <!-- Skills -->
+    <div class="card col-4">
+      <div class="card-head">
+        <h2 class="card-title">Skills</h2>
+        <span class="card-kicker"><span id="skills-count">0</span> instaladas</span>
+      </div>
+      <div class="skills-scroll">
+        <div class="skills-grid" id="skills-grid"></div>
+      </div>
+      <div class="skills-hint">clique pra ver o que cada skill faz</div>
+    </div>
+
+    <!-- Produção -->
+    <div class="card col-8">
+      <div class="card-head">
+        <h2 class="card-title">Produção</h2>
+        <span class="card-kicker">saídas · marketing · site</span>
+      </div>
+      <div id="output-list"></div>
+    </div>
+
+    <!-- Próximas ações -->
+    <div class="card col-4">
+      <div class="card-head">
+        <h2 class="card-title">Próximas ações</h2>
+        <span class="card-kicker">sugeridas</span>
+      </div>
+      <div class="actions" id="actions"></div>
+    </div>
+
+    <!-- Expandir o sistema -->
+    <div class="card col-12">
+      <div class="card-head">
+        <h2 class="card-title">Expandir o sistema</h2>
+        <span class="card-kicker">ferramentas · templates · MCPs</span>
+      </div>
+      <div class="expand-grid">
+        <div class="expand-col">
+          <h3>Ferramentas conectadas</h3>
+          <ul class="mcp-list" id="mcp-list"></ul>
+        </div>
+        <div class="expand-col">
+          <h3>Templates do iOS</h3>
+          <ul class="tpl-list" id="tpl-list"></ul>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ────────── Skill modal ────────── -->
+  <div class="modal-backdrop" id="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal" id="modal">
+      <button class="modal-close" id="modal-close" aria-label="Fechar">×</button>
+      <div class="modal-kicker" id="modal-kicker">SKILL</div>
+      <h3 class="modal-title" id="modal-title">—</h3>
+      <p class="modal-cmd" id="modal-cmd">—</p>
+      <div class="modal-section">
+        <div class="modal-section-label">O que faz</div>
+        <p id="modal-long">—</p>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">Como usar — exemplos</div>
+        <ul class="modal-examples" id="modal-examples"></ul>
+      </div>
+      <div class="modal-section">
+        <div class="modal-section-label">O que gera</div>
+        <p id="modal-output">—</p>
+      </div>
+      <div class="modal-meta">
+        <span>Localização · <strong id="modal-location">—</strong></span>
+        <span>Escopo · <strong id="modal-scope">—</strong></span>
+      </div>
+      <div class="modal-actions">
+        <a class="btn" id="modal-open-folder" href="#" target="_blank" rel="noopener">Abrir pasta da skill</a>
+        <a class="btn btn-ghost" id="modal-open-md" href="#" target="_blank" rel="noopener">Ver SKILL.md</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <span>Tagino_IOS · dashboard local</span>
+    <span id="foot-date">—</span>
+  </footer>
+</div>
+
+<!-- Dados do workspace — gerado pelo scripts/build-dashboard.mjs, gitignored.
+     Se data.js não existir, o dashboard cai pro estado vazio (EMPTY_DATA abaixo). -->
+<script src="data.js" onerror="void 0"></script>
+
+<script>
+/* ──────────────────────────────────────────────────────────────────
+   Estado vazio — usado quando data.js ainda não foi gerado.
+   Rode `node scripts/build-dashboard.mjs` (ou peça pro Claude rodar
+   /atualizar) pra popular o dashboard com os dados do seu workspace.
+   ────────────────────────────────────────────────────────────────── */
+const EMPTY_DATA = {
+  workspace: {
+    name: "—",
+    profile: "—",
+    owner: "—",
+    today: new Date().toISOString().slice(0, 10),
+    headline: "Bem-vindo ao Tagino_IOS.",
+    lead: "Esse dashboard ainda não foi populado. Rode /instalar pra preencher a memória do workspace, depois /atualizar pra gerar os dados deste painel.",
+  },
+  setup: [
+    { file: "_memoria/empresa.md",       label: "Empresa",      status: "miss", meta: "Aguardando /instalar — quem é você e o que faz" },
+    { file: "_memoria/preferencias.md",  label: "Preferências", status: "miss", meta: "Aguardando /instalar — tom de voz e estilo" },
+    { file: "_memoria/estrategia.md",    label: "Estratégia",   status: "miss", meta: "Aguardando /instalar — foco e prioridades" },
+    { file: "identidade/design-guide.md",label: "Identidade",   status: "miss", meta: "Aguardando /instalar — paleta, tipografia, logo" },
+  ],
+  identity: {
+    swatches: [
+      { name: "Cor 1",  hex: "#E5DECC", role: "Aguardando identidade" },
+      { name: "Cor 2",  hex: "#D9D2BF", role: "Aguardando identidade" },
+      { name: "Cor 3",  hex: "#CFC8B5", role: "Aguardando identidade" },
+      { name: "Cor 4",  hex: "#BFB7A2", role: "Aguardando identidade" },
+      { name: "Cor 5",  hex: "#A89F87", role: "Aguardando identidade" },
+    ],
+    type: [
+      { key: "Display",  sample: "Tipografia da sua marca.", family: "serif" },
+      { key: "Wordmark", sample: "SUA MARCA",                family: "pill"  },
+      { key: "Corpo",    sample: "Edite identidade/design-guide.md pra definir a paleta e a tipografia que aparecem aqui.", family: "sans" },
+    ],
+  },
+  strategy: {
+    headline: "Defina o foco atual em _memoria/estrategia.md.",
+    targetNum: "—",
+    targetLbl: "Meta-norte do seu negócio",
+    frentes: [
+      { title: "Frente 1", note: "edite _memoria/estrategia.md pra preencher" },
+      { title: "Frente 2", note: "as frentes ativas aparecem aqui depois do /instalar" },
+    ],
+    gargalo: "—",
+  },
+  skills: [
+    {
+      name: "/instalar", folder: "instalar", scope: "local",
+      desc: "primeiro setup do workspace",
+      long: "Roda na primeira vez que você abre o workspace. Faz uma entrevista curta sobre empresa, tom de voz, foco e identidade, e preenche _memoria/, identidade/ e adapta o CLAUDE.md ao seu perfil (solopreneur, freelancer, agência, empresa).",
+      examples: ["instalar", "primeiro setup", "configurar do zero"],
+      output: "Memória preenchida + CLAUDE.md customizado pro perfil",
+    },
+    {
+      name: "/atualizar", folder: "atualizar", scope: "local",
+      desc: "varredura completa da memória",
+      long: "Faz varredura completa dos arquivos de contexto e atualiza _memoria/ e identidade/ com tudo que mudou desde a última passada. Também regenera o dashboard.",
+      examples: ["atualizar", "rodar varredura completa", "sincronizar memória"],
+      output: "Atualização incremental dos arquivos de memória + dashboard regenerado",
+    },
+    {
+      name: "/salvar", folder: "salvar", scope: "local",
+      desc: "commit + push pro GitHub",
+      long: "Salva tudo no GitHub (commit + push). Na primeira vez configura o repositório remoto. Use sempre que quiser fazer backup ou disparar deploy via Netlify/Vercel.",
+      examples: ["salvar", "salva no github", "commit", "backup do trabalho"],
+      output: "Commit + push pro remote · deploy automático se Netlify estiver ligado",
+    },
+    {
+      name: "/carrossel", folder: "carrossel", scope: "local",
+      desc: "carrossel 1080×1350 + legenda",
+      long: "Cria carrossel pro Instagram (1080×1350) com a identidade visual da sua marca. Suporta carrossel texto puro, com foto IA (gerada via OpenAI) ou com foto importada. Render via Playwright. Legenda pronta no final.",
+      examples: ["carrossel sobre [seu tema] em 6 slides", "post explicando [conceito do seu nicho]", "carrossel com dica da semana"],
+      output: "marketing/conteudo/carrossel-<tema>-<data>/ · PNGs + legenda.md",
+    },
+    {
+      name: "/publicar-tema", folder: "publicar-tema", scope: "local",
+      desc: "tema → carrossel + blog + post",
+      long: "A partir de um tema, produz pacote completo de conteúdo: carrossel pro IG, post pro blog, legenda. Tudo em draft, pronto pra fila de aprovação via /aprovar-post.",
+      examples: ["publicar tema: [pergunta frequente do cliente]", "tema sobre [novidade do mercado]", "pacote sobre [serviço que você quer destacar]"],
+      output: "Conteúdo em draft em marketing/ — depois aprovar via /aprovar-post",
+    },
+    {
+      name: "/aprovar-post", folder: "aprovar-post", scope: "local",
+      desc: "publica no IG + FB via Graph API",
+      long: "Aprova um post da fila — flipa o blog de draft pra published, copia os PNGs do carrossel pro public folder do site, faz commit + push, aguarda o deploy do Netlify/Vercel, e posta o carrossel no Instagram + Facebook via Meta Graph API.",
+      examples: ["aprovar post X", "publicar o último carrossel", "mandar pro ar"],
+      output: "Post no IG/FB + commit + deploy",
+    },
+    {
+      name: "/anuncio-google", folder: "anuncio-google", scope: "local",
+      desc: "monta anúncio Google Ads",
+      long: "Monta estrutura completa de anúncio Google Ads (Search ou Display) — headlines, descrições, sitelinks, callouts, palavras-chave negativas — calibrada pro seu nicho.",
+      examples: ["anúncio Google pra [seu produto/serviço]", "campanha display pra [audiência]", "palavras-chave pra [seu nicho]"],
+      output: "Estrutura pronta pra colar no Google Ads Editor",
+    },
+    {
+      name: "/relatorio-ads", folder: "relatorio-ads", scope: "local",
+      desc: "consolida desempenho de ads",
+      long: "Consolida desempenho de campanhas (Meta + Google) em relatório semanal ou mensal com CPL, CTR, conversão por perfil de público, e recomendação concreta de ajuste.",
+      examples: ["relatório de ads da semana", "desempenho mensal das campanhas", "qual campanha pausar?"],
+      output: "Relatório markdown com tabelas + insights priorizados",
+    },
+    {
+      name: "/analisar-dados", folder: "analisar-dados", scope: "local",
+      desc: "lê planilha e devolve insight",
+      long: "Lê CSV ou XLSX (export de plataforma, planilha de clientes, dado operacional) e devolve resumo com números-chave, top destaques, anomalias e próximo passo sugerido.",
+      examples: ["analisar export do Meta Ads dessa semana", "que perfil converte mais?", "comparar resultado entre canais"],
+      output: "Tabela markdown + insights em texto direto",
+    },
+    {
+      name: "/email-profissional", folder: "email-profissional", scope: "local",
+      desc: "rascunha email no tom da marca",
+      long: "Rascunha email pronto pra enviar, calibrado pro tom de voz da sua marca. Suporta follow-up, agradecimento, envio de material, agendamento.",
+      examples: ["email pra cliente que pediu orçamento", "follow-up de quem visitou", "agradecer indicação"],
+      output: "Texto pronto pra colar em Gmail/Outlook",
+    },
+    {
+      name: "/responder-avaliacoes", folder: "responder-avaliacoes", scope: "local",
+      desc: "responde reviews em escala",
+      long: "Rascunha respostas a avaliações (Google Business Profile, reviews em portal, comentários) no tom da marca. Diferencia tom por estrela.",
+      examples: ["responder essa avaliação 5★", "resposta padrão pra reviews negativos", "agradecer indicação no Google"],
+      output: "Texto pronto pra colar na plataforma",
+    },
+    {
+      name: "/seo", folder: "seo", scope: "local",
+      desc: "auditoria SEO básica",
+      long: "Auditoria SEO de uma página ou de todo o site — meta tags, headings, alt text em imagens, schema.org, Core Web Vitals básicos. Lista priorizada de ajustes.",
+      examples: ["SEO da landing", "auditar página de serviços", "melhorar SEO do site"],
+      output: "Lista priorizada de ajustes (impacto vs esforço)",
+    },
+    {
+      name: "/comprimir-video", folder: "comprimir-video", scope: "local",
+      desc: "MP4 web · faststart · auto-crop",
+      long: "Comprime vídeo (HEVC 4K, MOV, MKV, AVI) pra MP4 H.264 com faststart pronto pra web. Aplica auto-crop de barras pretas se detectado, escala pra tamanho-alvo (web/social/hero). Bitrate ~10× menor mantendo qualidade visual. Extrai poster JPG.",
+      examples: ["comprimir esse vídeo de 1.2GB", "preparar vídeo pra Netlify", "converter reel pra web"],
+      output: "MP4 leve pronto pra deploy + poster JPG",
+    },
+    {
+      name: "/transcrever-audio", folder: "transcrever-audio", scope: "local",
+      desc: "áudio → texto timecoded (PT-BR)",
+      long: "Transcreve áudio (MP3, MP4, WAV, M4A, etc) pra texto timecoded em PT-BR usando faster-whisper local — sem custo de API, sem upload pra terceiros. Detecta idioma automaticamente.",
+      examples: ["transcrever esse áudio do WhatsApp", "passar reel pra texto", "transcrição do podcast com convidado"],
+      output: "Transcrição com timestamps por segmento + texto limpo concatenado",
+    },
+    {
+      name: "/apresentacao-pdf", folder: "apresentacao-pdf", scope: "local",
+      desc: "PDF editorial A4 com identidade",
+      long: "Gera PDF profissional editorial em A4 a partir de markdown, aplicando paleta e tipografia da sua marca. Templates: case study, brand book, sales deck, executive summary, relatório.",
+      examples: ["gerar PDF do book do cliente", "transformar essas notas em sales deck", "criar executive summary do mês"],
+      output: "saidas/<nome>.pdf",
+    },
+    {
+      name: "/premium-website-lancamento-aios", folder: "premium-website-lancamento-aios", scope: "local",
+      desc: "landing page de lançamento",
+      long: "Constrói landing page premium single-page (HTML+CSS+JS deploy-ready pra Netlify/Vercel). Estrutura padrão de lançamento — hero, sobre, assinatura, galeria, ficha, contato. Lead vai pro WhatsApp. Google Maps embed sem API key.",
+      examples: ["landing do meu próximo produto", "site de lançamento", "página com galeria e WhatsApp"],
+      output: "site/lancamento-<slug>/ pronto pra deploy",
+    },
+    {
+      name: "/mapear-rotinas", folder: "mapear-rotinas", scope: "local",
+      desc: "descobre tarefas pra automatizar",
+      long: "Faz uma entrevista curta sobre o que você repete toda semana e propõe skills concretas pra automatizar essas rotinas. Cria as aprovadas direto em .claude/skills/.",
+      examples: ["mapear rotinas", "o que dá pra automatizar?", "criar skill da minha rotina semanal"],
+      output: "Skills novas em .claude/skills/",
+    },
+    {
+      name: "/novo-projeto", folder: "novo-projeto", scope: "local",
+      desc: "inicia novo projeto a partir do template",
+      long: "Cria nova frente de trabalho (novo cliente, novo produto, nova campanha) usando o template padrão do Tagino_IOS. Carrega memória + identidade adaptadas ao contexto.",
+      examples: ["novo projeto: cliente X", "iniciar frente Y", "criar pasta pro próximo projeto"],
+      output: "Nova pasta de projeto pronta pra uso",
+    },
+    {
+      name: "/abrir", folder: "abrir", scope: "local",
+      desc: "abre arquivo no editor",
+      long: "Abre um arquivo ou pasta do workspace direto no VS Code (ou editor padrão). Atalho pra evitar navegar manualmente no explorador.",
+      examples: ["abrir _memoria/empresa.md", "abrir saidas/", "abrir o último carrossel"],
+      output: "Arquivo aberto no editor",
+    },
+  ],
+  expand: {
+    mcps: [
+      { name: "Instagram",        note: "Publicação automática via Graph API",         status: "available" },
+      { name: "WhatsApp Business", note: "Atendimento + envio de material via Cloud API", status: "available" },
+      { name: "Meta Ads",         note: "Criação e leitura de campanhas via Marketing API", status: "available" },
+      { name: "Google Ads",       note: "Criação e métricas via OAuth",                status: "available" },
+      { name: "Google Calendar",  note: "Agendamento automático de reuniões",          status: "available" },
+    ],
+    templates: [
+      { title: "Catálogo de ferramentas",  path: "templates/ferramentas/catalogo.md",     note: "APIs, CLIs e conectores disponíveis pra skills" },
+      { title: "Exemplos de identidade",   path: "templates/identidade/exemplos/",         note: "Design guides de referência por perfil" },
+      { title: "Perfis de CLAUDE.md",      path: "templates/perfis/",                      note: "Solopreneur · Freelancer · Agência · Empresa" },
+      { title: "Catálogo de skills",       path: "templates/skills/catalogo.md",           note: "Skills sugeridas como ponto de partida" },
+    ],
+  },
+  output: [],
+  actions: [
+    { text: "Rodar o primeiro setup",       note: "preenche _memoria/, identidade/, CLAUDE.md conforme seu perfil", cmd: "/instalar" },
+    { text: "Popular esse dashboard",       note: "varre o workspace e gera dashboard/data.js com seus dados",       cmd: "/atualizar" },
+    { text: "Conectar ferramentas",         note: "Instagram, WhatsApp, Meta Ads, Google Ads, Calendar",            cmd: "MCP" },
+    { text: "Salvar no GitHub",             note: "primeiro backup do workspace",                                    cmd: "/salvar" },
+  ],
+};
+
+/* DATA usado pela renderização — vem do data.js (gerado) se existir,
+   senão cai pro estado vazio (template). */
+const DATA = (window.DASHBOARD_DATA && typeof window.DASHBOARD_DATA === "object")
+  ? window.DASHBOARD_DATA
+  : EMPTY_DATA;
+
+/* ──────────────────────────────────────────────────────────────────
+   Renderização
+   ────────────────────────────────────────────────────────────────── */
+const $ = (sel) => document.querySelector(sel);
+const el = (tag, attrs = {}, ...children) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === "class") n.className = v;
+    else if (k === "html") n.innerHTML = v;
+    else if (k.startsWith("on") && typeof v === "function") n.addEventListener(k.slice(2), v);
+    else n.setAttribute(k, v);
+  }
+  for (const c of children.flat()) {
+    if (c == null) continue;
+    n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  }
+  return n;
+};
+
+/* Project root — usado pra construir links file:/// das pastas locais.
+   Como esse arquivo vive em dashboard/index.html, raiz do projeto = href sem o final. */
+const PROJECT_ROOT = (() => {
+  const here = window.location.href.split("?")[0].split("#")[0];
+  return here.replace(/dashboard\/index\.html?$/, "").replace(/dashboard\/?$/, "");
+})();
+const fileUrl = (relPath) => {
+  // Suporta path com barra final (pasta) ou arquivo
+  return PROJECT_ROOT + relPath.replace(/^\/+/, "");
+};
+
+/* Top */
+$("#ws-name").textContent = DATA.workspace.name;
+$("#ws-meta").textContent = `${DATA.workspace.profile} · ${DATA.workspace.owner} · ${DATA.workspace.today}`;
+$("#foot-date").textContent = DATA.workspace.today;
+
+/* Hero */
+$("#hero-title").textContent = DATA.workspace.headline;
+$("#hero-lead").textContent  = DATA.workspace.lead;
+
+const stats = [
+  { num: DATA.setup.filter(s => s.status === "ok").length + "/" + DATA.setup.length, lbl: "Memória preenchida" },
+  { num: DATA.skills.length, lbl: "Skills instaladas" },
+  { num: DATA.output.length, lbl: "Peças produzidas" },
+  { num: DATA.strategy.frentes.length, lbl: "Frentes ativas" },
+];
+const heroStats = $("#hero-stats");
+stats.forEach(s => {
+  heroStats.appendChild(
+    el("div", { class: "stat" },
+      el("div", { class: "stat-num" }, String(s.num)),
+      el("div", { class: "stat-lbl" }, s.lbl),
+    )
+  );
+});
+
+/* Progress bar */
+const okCount = DATA.setup.filter(s => s.status === "ok").length;
+const pct = Math.round((okCount / DATA.setup.length) * 100);
+$("#progress-pct").textContent = pct + "%";
+setTimeout(() => { $("#progress-fill").style.width = pct + "%"; }, 60);
+
+const progressList = $("#progress-list");
+DATA.setup.forEach(s => {
+  const tag = s.status === "ok" ? "preenchido"
+            : s.status === "pend" ? "parcial"
+            : "pendente";
+  const cls = "tag tag-" + (s.status === "ok" ? "ok" : s.status === "pend" ? "pend" : "miss");
+  progressList.appendChild(
+    el("li", {},
+      el("span", {}, s.label),
+      el("span", { class: cls }, tag),
+    )
+  );
+});
+
+/* Memória */
+const mem = $("#memory-list");
+DATA.setup.forEach(s => {
+  const dotCls = "mem-dot " + (s.status === "ok" ? "" : s.status === "pend" ? "pend" : "miss");
+  const badgeCls = "mem-badge " + (s.status === "ok" ? "" : s.status === "pend" ? "pend" : "miss");
+  const badgeTxt = s.status === "ok" ? "preenchido" : s.status === "pend" ? "parcial" : "pendente";
+  const parts = s.file.split("/");
+  const dir = parts.slice(0, -1).join("/") + "/";
+  const file = parts[parts.length - 1];
+  const row = el("div", { class: "mem-row" },
+    el("span", { class: dotCls.trim() }),
+    el("div", {},
+      el("div", { class: "mem-file" },
+        el("span", { class: "path" }, dir),
+        file,
+      ),
+      el("div", { class: "mem-meta" }, s.meta),
+    ),
+    el("span", { class: badgeCls.trim() }, badgeTxt),
+  );
+  // Só vira link se o arquivo existir (status ok ou pend); pendentes ainda apontam pra pasta-pai
+  const targetPath = s.status === "miss" ? dir : s.file;
+  const a = el("a", {
+    class: "row-link",
+    href: fileUrl(targetPath),
+    target: "_blank",
+    rel: "noopener",
+    title: "Abrir no explorador local",
+  });
+  a.appendChild(row);
+  mem.appendChild(a);
+});
+
+/* Identidade — swatches */
+const sw = $("#swatches");
+DATA.identity.swatches.forEach(c => {
+  sw.appendChild(
+    el("div", { class: "swatch" },
+      el("div", { class: "swatch-color", style: `background:${c.hex}` }),
+      el("div", { class: "swatch-meta" },
+        el("div", { class: "swatch-name" }, c.name),
+        el("div", { class: "swatch-hex" }, c.hex),
+      ),
+    )
+  );
+});
+
+/* Identidade — tipografia */
+const tr = $("#type-rows");
+DATA.identity.type.forEach(t => {
+  let sample;
+  if (t.family === "serif") {
+    sample = el("div", { class: "type-sample-serif" }, t.sample);
+  } else if (t.family === "pill") {
+    const pill = el("span", {
+      style: "background:#0F0F0E;color:#fff;font-family:var(--sans);font-weight:600;font-size:12px;letter-spacing:0.18em;padding:5px 12px;border-radius:999px;"
+    }, t.sample);
+    sample = el("div", {}, pill);
+  } else {
+    sample = el("div", { class: "type-sample-sans" }, t.sample);
+  }
+  tr.appendChild(
+    el("div", { class: "type-row" },
+      el("div", { class: "type-key" }, t.key),
+      sample,
+    )
+  );
+});
+
+/* Estratégia */
+$("#strat-headline").textContent = DATA.strategy.headline;
+$("#strat-target-num").textContent = DATA.strategy.targetNum;
+$("#strat-target-lbl").textContent = DATA.strategy.targetLbl;
+
+const fr = $("#frentes");
+DATA.strategy.frentes.forEach((f, i) => {
+  fr.appendChild(
+    el("div", { class: "frente" },
+      el("div", { class: "num" }, String(i + 1).padStart(2, "0")),
+      el("div", {},
+        el("strong", {}, f.title),
+        document.createTextNode(" — "),
+        el("span", {}, f.note),
+      ),
+    )
+  );
+});
+
+/* Skills */
+$("#skills-count").textContent = DATA.skills.length;
+const sg = $("#skills-grid");
+DATA.skills.forEach((sk, idx) => {
+  const btn = el("button", { class: "skill", type: "button", "data-idx": String(idx) },
+    el("div", { class: "skill-name" }, sk.name),
+    el("div", { class: "skill-desc" }, sk.desc),
+  );
+  btn.addEventListener("click", () => openSkill(idx));
+  sg.appendChild(btn);
+});
+
+/* Produção */
+const out = $("#output-list");
+if (!DATA.output || DATA.output.length === 0) {
+  out.appendChild(
+    el("div", {
+      style: "padding:18px 4px;text-align:center;color:var(--ink-mute);font-size:13px;line-height:1.6;"
+    },
+      "Nada produzido ainda.",
+      el("br"),
+      el("span", { style: "font-family:var(--mono);font-size:11px;" }, "rode /atualizar pra varrer saidas/, marketing/ e site/"),
+    )
+  );
+} else {
+  DATA.output.forEach(o => {
+    const row = el("div", { class: "out-row" },
+      el("div", { class: "out-type" }, o.type),
+      el("div", { class: "out-name" },
+        o.name,
+        el("div", { class: "path" }, o.path),
+      ),
+      el("div", { class: "out-date" }, o.date),
+    );
+    const a = el("a", {
+      class: "row-link",
+      href: fileUrl(o.path),
+      target: "_blank",
+      rel: "noopener",
+      title: "Abrir no explorador local",
+    });
+    a.appendChild(row);
+    out.appendChild(a);
+  });
+}
+
+/* Expandir — MCPs */
+const mcpList = $("#mcp-list");
+DATA.expand.mcps.forEach(m => {
+  mcpList.appendChild(
+    el("li", { class: "mcp" },
+      el("div", {},
+        el("div", { class: "mcp-name" }, m.name),
+        el("div", { class: "mcp-note" }, m.note),
+      ),
+      el("span", { class: "mcp-status " + (m.status === "connected" ? "connected" : "") },
+        m.status === "connected" ? "conectada" : "disponível"
+      ),
+    )
+  );
+});
+
+/* Expandir — Templates */
+const tplList = $("#tpl-list");
+DATA.expand.templates.forEach(t => {
+  tplList.appendChild(
+    el("a", {
+      class: "tpl",
+      href: fileUrl(t.path),
+      target: "_blank",
+      rel: "noopener",
+      title: "Abrir no explorador local",
+    },
+      el("div", { class: "tpl-path" }, t.path),
+      el("div", { class: "tpl-title" }, t.title),
+      el("div", { class: "mcp-note", style: "margin-top:4px;" }, t.note),
+    )
+  );
+});
+
+/* ─────────── Skill modal ─────────── */
+const backdrop = $("#modal-backdrop");
+const modal = $("#modal");
+
+function openSkill(idx) {
+  const sk = DATA.skills[idx];
+  if (!sk) return;
+  $("#modal-kicker").textContent = "SKILL · " + (sk.scope === "global" ? "GLOBAL" : "LOCAL");
+  $("#modal-title").textContent = sk.name.replace(/^\//, "");
+  $("#modal-cmd").textContent = sk.name;
+  $("#modal-long").textContent = sk.long;
+  $("#modal-output").textContent = sk.output;
+  $("#modal-location").textContent = ".claude/skills/" + sk.folder + "/";
+  $("#modal-scope").textContent = sk.scope === "global" ? "Global (todos workspaces)" : "Local (esse workspace)";
+  const ex = $("#modal-examples");
+  ex.innerHTML = "";
+  sk.examples.forEach(e => ex.appendChild(el("li", {}, e)));
+  $("#modal-open-folder").setAttribute("href", fileUrl(".claude/skills/" + sk.folder + "/"));
+  $("#modal-open-md").setAttribute("href", fileUrl(".claude/skills/" + sk.folder + "/SKILL.md"));
+  backdrop.classList.add("open");
+  backdrop.removeAttribute("hidden");
+  document.body.style.overflow = "hidden";
+}
+function closeSkill() {
+  backdrop.classList.remove("open");
+  backdrop.setAttribute("hidden", "");
+  document.body.style.overflow = "";
+}
+$("#modal-close").addEventListener("click", closeSkill);
+backdrop.addEventListener("click", (e) => { if (e.target === backdrop) closeSkill(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeSkill(); });
+
+/* Ações */
+const ac = $("#actions");
+DATA.actions.forEach(a => {
+  ac.appendChild(
+    el("div", { class: "action" },
+      el("div", { class: "action-text" },
+        el("strong", {}, a.text),
+        el("small", {}, a.note),
+      ),
+      el("span", { class: "action-cmd" }, a.cmd),
+    )
+  );
+});
+</script>
+</body>
+</html>
