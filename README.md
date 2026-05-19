@@ -2,10 +2,10 @@
 
 > O sistema operacional do seu negócio dentro do Claude Code.
 
-Você acaba de instalar o Tagino_IOS. Em alguns minutos, sua empresa vai
-ter uma memória própria, uma identidade visual aplicada em tudo que
-o sistema gerar, e 15 skills prontas pra fazer marketing, SEO, ads
-e operação rodarem com você dirigindo.
+Você acaba de instalar o Tagino_IOS. Em alguns minutos, sua empresa
+tem memória própria, identidade visual aplicada em tudo que o sistema
+gerar, 19 skills prontas pra marketing, SEO, ads, mídia e operação, e
+um dashboard local pra ver o estado do sistema num olhar.
 
 Bora voar.
 
@@ -65,14 +65,43 @@ carrossel + 3 legendas amarradas · `/seo` roda fluxo completo de 8 passos
 · `/responder-avaliacoes` escreve respostas humanas pras reviews do
 Google · `/aprovar-post` publica blog + Instagram + Facebook num comando.
 
+**Mídia rica** — peças além do post
+`/apresentacao-pdf` gera PDF editorial A4 a partir de markdown com a
+paleta e tipografia da marca (case study, brand book, sales deck,
+executive summary, relatório) · `/transcrever-audio` passa áudio
+(MP3, MP4, WAV, M4A) pra texto timecoded em PT-BR via faster-whisper
+local — sem custo de API, sem upload · `/comprimir-video` comprime
+vídeo (HEVC 4K, MOV, MKV) pra MP4 H.264 web-ready com bitrate ~10×
+menor, auto-crop de barras pretas e poster JPG extraído.
+
 **Anúncios pagos** — onde o dinheiro entra
 `/anuncio-google` monta a campanha inteira em CSV pronto pra importar
 no Google Ads Editor · `/relatorio-ads` lê os exports de Google + Meta
 e devolve relatório semanal com alertas e recomendações.
 
+**Lançamentos e sites** — captação direta
+`/premium-website-lancamento-aios` constrói landing page premium de
+lançamento imobiliário (HTML + CSS + JS, deploy-ready pra Netlify ou
+Vercel) com galeria, ficha, formulário pra WhatsApp e Maps embed sem
+API key.
+
 **Produção** — ferramentas do dia a dia
 `/analisar-dados` lê CSV/XLSX/PDF e gera resumo executivo ·
 `/email-profissional` rascunha email a partir de contexto livre.
+
+---
+
+## Dashboard local
+
+Abre o `dashboard.html` na raiz do projeto (duplo-clique, sem servidor,
+sem internet) pra ver num olhar o estado do sistema: o que da memória
+tá preenchido, quais skills você tem instaladas, qual a paleta da
+marca, o que já foi produzido, e quais ferramentas (Instagram, WhatsApp,
+Meta Ads, Google Ads, Calendar) podem ser conectadas.
+
+O dashboard se popula sozinho via `node scripts/build-dashboard.mjs` —
+scan do workspace inteiro pra gerar `dashboard/data.js`. Cada workspace
+tem o seu, gitignored. Detalhes em [`dashboard/README.md`](dashboard/README.md).
 
 ---
 
