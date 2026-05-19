@@ -7,6 +7,45 @@ Skills externas prontas pra instalar. Use como referencia ao criar skills novas 
 
 ---
 
+## Skills inclusas no Tagino_IOS (ja vem instaladas)
+
+Quatro skills adicionais bundled neste repo. Funcionam sozinhas, sem dependencia de outras skills.
+
+### Premium Website (lancamento imobiliario)
+**O que faz:** Gera landing page completa pra lancamento imobiliario em HTML+CSS+JS vanilla. 10 secoes editoriais (hero · sobre · assinatura · galeria · unidades · lazer · localizacao · ficha · contato), Google Maps embed, form que abre WhatsApp, lightbox de galeria, vídeos otimizados. Deploy-ready pra Netlify ou Vercel.
+**Bom pra:** Corretor de imoveis lancando empreendimento novo. Funciona pra Benx, Cyrela, MRV, Gafisa — qualquer construtora.
+**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/premium-website-lancamento-aios`
+**Fonte:** Bundled neste repo (`.claude/skills/premium-website-lancamento-aios/`)
+
+### Transcrever Audio
+**O que faz:** Transcreve audio (MP3, MP4, WAV, M4A) pra texto timecoded em PT-BR usando faster-whisper LOCAL. Sem custo de API, sem upload pra terceiros. Bom pra reels, podcasts, calls.
+**Bom pra:** Extrair fala de qualquer video/audio. Material confidencial (call de cliente, briefing) que nao pode ir pra OpenAI/cloud.
+**Precisa de:** `pip install faster-whisper` (instala na primeira execucao)
+**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/transcrever-audio`
+**Fonte:** Bundled neste repo (`.claude/skills/transcrever-audio/`)
+
+### Comprimir Video
+**O que faz:** Comprime videos pra web (MP4 H.264 com faststart) via ffmpeg. Aceita 4K HEVC, MOV, MKV. Auto-detecta barras pretas e crop. Perfis pra hero · tour · background · social.
+**Bom pra:** Preparar videos pra site, reels, anuncios. Reduz peso 5-20x mantendo qualidade.
+**Precisa de:** ffmpeg instalado (`brew install ffmpeg` no Mac, `winget install ffmpeg` no Windows)
+**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/comprimir-video`
+**Fonte:** Bundled neste repo (`.claude/skills/comprimir-video/`)
+
+### Apresentacao PDF
+**O que faz:** Gera PDF editorial A4 a partir de markdown ou notas. 5 templates (executive summary · case study · brand book · sales deck · relatorio). Usa identidade visual da marca (cores + fontes do `identidade/design-guide.md`) ou defaults editoriais elegantes.
+**Bom pra:** Apresentacoes pra cliente, executive summary, case study, sales deck, brand book, relatorio mensal.
+**Precisa de:** Playwright instalado (`npx playwright install chromium`)
+**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/apresentacao-pdf`
+**Fonte:** Bundled neste repo (`.claude/skills/apresentacao-pdf/`)
+
+---
+
+## Skills externas (Claude Code + globais)
+
+A partir daqui, skills que vem nativo no Claude Code ou que voce instala separado.
+
+---
+
 ## Escrever copy e textos de venda
 
 ### Schwartz Copy (resposta direta)
