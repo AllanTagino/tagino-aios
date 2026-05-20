@@ -347,6 +347,28 @@ PDF deve:
 
 ---
 
+## Refinement chips
+
+Depois de gerar o PDF, mostrar preview (screenshot da primeira página ou link) e listar chips pra ajustar antes de finalizar. Ver `referencias/refinement-chips.md` pro padrão geral.
+
+Formato:
+
+> **Refinements rápidos** (digita o número ou texto livre):
+>
+> `1` mais conciso (menos páginas) · `2` mais visual (mais imagens, menos texto) · `3` mais técnico (mais detalhes) · `4` outro layout · `5` outra estrutura completa
+
+**Comportamento por número:**
+- `1` → cortar páginas redundantes, reduzir texto introdutório (alvo: -30% páginas)
+- `2` → adicionar imagens/gráficos onde só tem texto corrido, balancear texto:imagem ~60:40
+- `3` → expandir seções com detalhes técnicos (datasheets, tabelas, metodologia), adicionar appendix se necessário
+- `4` → trocar layout (1-coluna ↔ 2-coluna; serif ↔ sans; escuro ↔ claro)
+- `5` → repensar estrutura completa (executive → detail → appendix vs. cronológico storytelling)
+- **Texto livre** → custom
+
+Re-renderizar PDF após cada refinement. Limite: 4 rounds.
+
+---
+
 ## Limites + dicas
 
 - **Não use frameworks** (React, Vue, etc.) — HTML+CSS puro renderiza mais previsível no Playwright
