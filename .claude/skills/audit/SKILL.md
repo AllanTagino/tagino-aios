@@ -42,11 +42,12 @@ Roda check estrutural do workspace Tagino_AIOS. Score 0-100 em 4 eixos. Top 3 ga
 
 | Critério | Pts | Como detectar |
 |---|---|---|
-| `_memoria/empresa.md` preenchido | 5 | Read empresa.md. Tem `**Nome:**` com valor + `**O que faz:**` >20 chars + `**Cliente:**` >20 chars. Os 3 = 5; 2 = 3; 1 = 1; 0 = 0 |
-| `_memoria/preferencias.md` com tom + ranço | 5 | "Tom de voz" section >50 chars + "O que evitar" >20 chars. Ambos = 5; um = 3; nenhum = 0 |
-| `_memoria/estrategia.md` com gargalo + foco | 5 | "Prioridade principal" ou "Gargalo identificado" >20 chars + "O que tirar das costas" >20 chars. Ambos = 5; um = 3; nenhum = 0 |
-| Voice sample real (não contaminado) | 5 | Bloco `> ...` em preferencias.md `## Tom de voz` com >100 chars. Se `voice_sample_contamination_risk: true` no arquivo → max 2pts. Senão >100 chars = 5; <100 = 2; missing = 0 |
-| `decisions/log.md` tem 1+ entry | 5 | Contar linhas com regex `^## \d{4}-\d{2}-\d{2}` em decisions/log.md. 1+ = 5; 0 = 0 |
+| `_memoria/empresa.md` preenchido | 4 | Read empresa.md. Tem `**Nome:**` com valor + `**O que faz:**` >20 chars + `**Cliente:**` >20 chars. Os 3 = 4; 2 = 2; 1 = 1; 0 = 0 |
+| `_memoria/preferencias.md` com tom + ranço | 4 | "Tom de voz" section >50 chars + "O que evitar" >20 chars. Ambos = 4; um = 2; nenhum = 0 |
+| `_memoria/estrategia.md` com gargalo + foco | 4 | "Prioridade principal" ou "Gargalo identificado" >20 chars + "O que tirar das costas" >20 chars. Ambos = 4; um = 2; nenhum = 0 |
+| Voice sample real (não contaminado) | 4 | Bloco `> ...` em preferencias.md `## Tom de voz` com >100 chars. Se `voice_sample_contamination_risk: true` no arquivo → max 2pts. Senão >100 chars = 4; <100 = 2; missing = 0 |
+| `decisions/log.md` tem 1+ entry | 4 | Contar linhas com regex `^## \d{4}-\d{2}-\d{2}` em decisions/log.md. 1+ = 4; 0 = 0 |
+| `intake.md` source-of-truth preenchido | 5 | Read intake.md. Contar Qs com body real (não placeholder `_[...]_`). 10/10 = 5; 7-9 = 3; 4-6 = 1; ≤3 = 0. Se arquivo missing = 0 (workspace pré-B2 ou sem migração — sinaliza necessidade de upgrade). |
 
 ### Identidade (25 pts)
 
@@ -63,7 +64,7 @@ Roda check estrutural do workspace Tagino_AIOS. Score 0-100 em 4 eixos. Top 3 ga
 | Critério | Pts | Como detectar |
 |---|---|---|
 | 3+ subpastas em marketing/ ou saidas/ últimos 30d | 5 | Glob `marketing/**/2026-*` e `saidas/**/2026-*` filtrar por mtime <30d. 3+ = 5; 1-2 = 2; 0 = 0 |
-| Output (arquivos) últimos 30d | 10 | Contar arquivos em `marketing/`, `saidas/`, `site/` recursivo com mtime <30d. 10+ = 10; 5-9 = 6; 1-4 = 3; 0 = 0 |
+| Output (arquivos) últimos 30d | 10 | Contar arquivos em `marketing/`, `saidas/`, `site/` recursivo com mtime <30d, **excluindo scaffolding** (`README.md`, `.gitkeep`, `.gitignore`, `*.example`). 10+ = 10; 5-9 = 6; 1-4 = 3; 0 = 0 |
 | Git commits regulares | 5 | `git log --since="30 days ago" --oneline | wc -l`. 8+ = 5; 4-7 = 3; 1-3 = 1; 0 ou no .git = 0 |
 | `.env` com 1+ chave conectada | 5 | Read `.env` se existir, contar linhas `^[A-Z_]+=.+` (não vazias). 2+ = 5; 1 = 3; 0 ou no .env = 0 |
 
@@ -73,7 +74,7 @@ Roda check estrutural do workspace Tagino_AIOS. Score 0-100 em 4 eixos. Top 3 ga
 |---|---|---|
 | MCPs conectados | 10 | Read `.mcp.json` ou `.claude/settings.json` (key `mcpServers`). Contar tier-1 (Instagram, WhatsApp, Meta Ads, Google Ads, Calendar). 3+ = 10; 2 = 6; 1 = 3; 0 = 0 |
 | Publicação automática rodada | 5 | Glob `marketing/**/.published` ou check git log por `aprovar-post` nos últimos 30d. 1+ ocorrência = 5; 0 = 0 |
-| Ritual semanal definido | 5 | Grep em estrategia.md por `semanal`, `toda sexta`, `weekly`, `mapear-rotinas`. Mencionado = 5; não = 0 |
+| Ritual semanal definido | 5 | Grep em estrategia.md por **padrão verbal de ação**: `roda[r]?\s+/mapear-rotinas`, `toda sexta`, `semanalmente`, `ritual semanal`, `weekly review`, `cadência semanal`. **NÃO matcha** "toda semana" isolado (false-positive comum em "tirar das costas toda semana"). Mencionado = 5; não = 0 |
 | Hooks ativos | 5 | `.claude/settings.json` tem key `hooks` com 1+ entry. = 5; 0 ou file missing = 0 |
 
 ---
