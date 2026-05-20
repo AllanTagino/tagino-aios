@@ -142,7 +142,42 @@ rm -rf "$HOME/CLAUDE/tagino-<slug>/.git"
 
 ---
 
-## Fase 4 — Popular os arquivos
+## Fase 4 — Escrever `intake.md` (source-of-truth)
+
+**Antes de derivar qualquer `_memoria/*.md`, escrever o `intake.md` a partir dos dados da submission.** Isso preserva as respostas originais como source-of-truth editável — Allan/cliente pode editar `intake.md` depois e rodar `/instalar` pra regenerar.
+
+Template do intake.md já vem no clone (`intake.md` na raiz, com placeholders). Sobrescrever cada Q com a resposta correspondente.
+
+**Mapping:**
+
+```yaml
+---
+perfil: {ENTREVISTA.perfil}
+data_intake: {ENTREVISTA.timestamp} (só a parte YYYY-MM-DD)
+voice_method: {ENTREVISTA.voice_method || ""}
+---
+
+## Q1 — Como você chama o que faz?
+{ENTREVISTA.q1}
+
+## Q2 — O que sua empresa entrega, em uma frase?
+{ENTREVISTA.q2}
+
+(...e assim por diante até Q10)
+
+## Q5 — Cola um exemplo da tua escrita (paste verbatim, não digita)
+> {ENTREVISTA.q5}
+```
+
+Q5 fica em blockquote (`>`). Outras Qs são texto plano. Pra Q9 (cores) e Q6 (ranço), manter formato original (texto livre com itens separados por vírgula).
+
+---
+
+## Fase 5 — Derivar `_memoria/*.md` + `identidade/design-guide.md` + `CLAUDE.md`
+
+**A partir desse ponto, a lógica de derivação é IDÊNTICA à Fase 3 do `/instalar`.** Em vez de duplicar tudo aqui, segue o mesmo algoritmo descrito em `.claude/skills/instalar/SKILL.md` seção "Fase 3 — Derive".
+
+Resumo da derivação (referência rápida, fonte canônica é `/instalar`):
 
 ### `_memoria/empresa.md`
 
@@ -290,7 +325,7 @@ Se `q10` menciona arquivo subido ("subi logo.svg"), adicionar nota:
 
 ---
 
-## Fase 5 — Limpeza e checks
+## Fase 6 — Limpeza e checks
 
 - Deletar `_memoria/.gitkeep` se existir (não precisa mais, arquivos populados)
 - Confirmar que cada arquivo populado tem conteúdo real (não placeholder)
@@ -301,7 +336,7 @@ Se `q10` menciona arquivo subido ("subi logo.svg"), adicionar nota:
 
 ---
 
-## Fase 6 — Resumo final
+## Fase 7 — Resumo final
 
 ```
 ✓ Workspace criado: ~/CLAUDE/tagino-<slug>/

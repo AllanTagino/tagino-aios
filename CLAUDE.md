@@ -73,6 +73,18 @@ valor duradouro.
 
 ---
 
+## Atualizar contexto via `intake.md`
+
+Pra mudanças estruturais no contexto do negócio (mudou ICP, oferta, posicionamento, paleta, etc.):
+
+1. Editar `intake.md` na raiz do workspace — é a **source-of-truth** das 10 respostas
+2. Rodar `/instalar` de novo — `_memoria/*.md` + `identidade/design-guide.md` + `CLAUDE.md` regeneram a partir do intake
+3. Idempotente — pode rodar 100x sem quebrar nada
+
+⚠️ **Edição direta nos `_memoria/*.md`** é sobrescrita na próxima run do `/instalar`. Pra alteração pontual sem regen, segue o fluxo "Aprender com correções" abaixo (Claude faz patches inline).
+
+---
+
 ## Manter contexto atualizado
 
 Ao terminar uma tarefa que mudou algo relevante (cliente novo, skill
