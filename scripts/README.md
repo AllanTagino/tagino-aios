@@ -2,9 +2,15 @@
 
 Scripts Node.js e Python que as skills chamam quando precisam fazer coisas fora do alcance da IA pura (gerar imagem, postar em rede social, renderizar HTML em PNG).
 
-A pasta vem **vazia** — cada skill que precisa de script tem instrução de como criar (e geralmente é um único setup por integração que você vai ativar).
+## Scripts já incluídos
 
-## Scripts comuns
+| Arquivo | Stack | O que faz |
+|---|---|---|
+| `nano-banana-enhance.py` | Python | Roda prompt + imagem(ns) através do kie.ai Nano Banana Pro (Gemini 2.5 Flash Image) e salva o resultado local. Usado pela skill `/image-enhancer-aios`. |
+| `build-dashboard.mjs` | Node | Compila os dados do workspace pro dashboard JSON. |
+| `requirements.txt` | — | Dependências Python (`pip install -r scripts/requirements.txt`). |
+
+## Scripts gerados sob demanda
 
 Conforme você for ativando skills, isso aqui vai sendo populado. Lista do que cada skill espera encontrar:
 
@@ -19,21 +25,26 @@ Conforme você for ativando skills, isso aqui vai sendo populado. Lista do que c
 
 ## Pré-requisitos comuns
 
-A maioria dos scripts depende de:
+**Python 3.10+** (pro `nano-banana-enhance.py`)
+```powershell
+pip install -r scripts/requirements.txt
+```
 
-**Node.js 20+** instalado na máquina
+**Node.js 20+** (pros scripts JS — opcional, só se for usar carrossel/Meta Graph)
 
-**.env** na raiz do projeto com as chaves de API:
+**`.env`** na raiz do projeto com as chaves de API. Copia `.env.example` pra `.env` e cola tuas chaves, **ou** roda `/conectar <servico>` no Claude Code que ele faz o setup com validação:
+
 ```bash
-OPENAI_API_KEY=sk-...               # pra gerar-imagem.js
+KIE_API_KEY=...                     # pra nano-banana-enhance.py + /image-enhancer-aios
+OPENAI_API_KEY=sk-...               # pra gerar-imagem.js + /carrossel Tipo 2
 META_PAGE_ACCESS_TOKEN=...          # pra postar-instagram.js + postar-facebook.js
 META_PAGE_ID=...
 META_IG_USER_ID=...
 SITE_URL=https://seudominio.com.br
 ```
 
-**Playwright** (pra renderizar HTML em PNG):
-```bash
+**Playwright** (pra renderizar HTML em PNG, gerado quando precisar):
+```powershell
 npm install playwright
 npx playwright install chromium
 ```
@@ -44,8 +55,25 @@ Quando você roda uma skill que precisa de script ausente, o Claude vai:
 
 1. Detectar que falta o script
 2. Te perguntar se quer configurar agora
-3. Te guiar no setup das chaves de API (Meta, OpenAI, etc.)
+3. Te guiar no setup das chaves de API (`/conectar`)
 4. Criar o script já configurado
 5. Rodar a skill
 
 Você não precisa decorar nada. Roda a skill, segue o fluxo.
+
+## Quick start — Nano Banana enhance
+
+```powershell
+# 1. Setup uma vez por workspace
+pip install -r scripts/requirements.txt
+# (e adiciona KIE_API_KEY no .env via /conectar kieai)
+
+# 2. Rodar enhancement
+python scripts/nano-banana-enhance.py `
+  --input "dados/oficial/.../render.jpg" `
+  --prompt-file "marketing/enhanced/cena/prompt.txt" `
+  --negative-file "marketing/enhanced/cena/negative.txt" `
+  --output "marketing/enhanced/cena/render-enhanced.png"
+```
+
+Custo ~$0.09 USD por imagem @ 2K · 30-90s por render.
