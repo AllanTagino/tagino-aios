@@ -138,6 +138,8 @@ const buildCarrosselGallery = (folderAbsPath, folderName) => {
   .btn { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink-soft); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
   .btn:hover { color: var(--ink); border-color: var(--ink-mute); }
   .btn-ok { color: var(--ok); border-color: var(--ok); }
+  .btn-primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .btn-primary:hover { color: #fff; border-color: var(--ink); background: var(--accent); }
   .actions { display: flex; gap: 12px; flex-wrap: wrap; }
   .footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--ink-mute); font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
 </style>
@@ -167,11 +169,15 @@ const buildCarrosselGallery = (folderAbsPath, folderName) => {
   <div class="section-head">Legenda</div>
   <div class="legenda-card">
     ${legendaHtml}
-    ${legenda ? `<div class="legenda-actions"><button class="btn" id="copy-btn" type="button">📋 Copiar legenda</button></div>` : ""}
+    ${legenda ? `<div class="legenda-actions">
+      <a class="btn" href="legenda.md" download="legenda.txt">📥 Baixar .txt</a>
+      <button class="btn" id="copy-btn" type="button">📋 Copiar legenda</button>
+    </div>` : ""}
   </div>
 
   <div class="section-head">Ações</div>
   <div class="actions">
+    <button class="btn btn-primary" id="download-all-btn" type="button">📥 Baixar todos os slides (${slideCount})</button>
     <a class="btn" href="." target="_blank" rel="noopener">📂 Abrir pasta</a>
     <a class="btn" href="../../../dashboard/index.html">← Voltar ao dashboard</a>
   </div>
@@ -179,6 +185,7 @@ const buildCarrosselGallery = (folderAbsPath, folderName) => {
   <div class="footer">gerado por scripts/build-dashboard.mjs · ${today}</div>
 </div>
 <script>
+  // Copiar legenda pro clipboard
   const btn = document.getElementById('copy-btn');
   const txt = document.getElementById('legenda-text');
   if (btn && txt) {
@@ -192,6 +199,35 @@ const buildCarrosselGallery = (folderAbsPath, folderName) => {
       } catch (e) {
         btn.textContent = '⚠ Erro';
         setTimeout(() => { btn.textContent = '📋 Copiar legenda'; }, 1800);
+      }
+    });
+  }
+
+  // Baixar todos os slides em sequencia (browser pode pedir permissao
+  // pra "multiplos downloads do site" — clicar Permitir)
+  const SLIDES = ${JSON.stringify(slides.map((s) => slidesDirRel + s))};
+  const dlBtn = document.getElementById('download-all-btn');
+  if (dlBtn) {
+    dlBtn.addEventListener('click', async () => {
+      const orig = dlBtn.textContent;
+      dlBtn.disabled = true;
+      try {
+        for (let i = 0; i < SLIDES.length; i++) {
+          dlBtn.textContent = '⬇ ' + (i + 1) + '/' + SLIDES.length;
+          const a = document.createElement('a');
+          a.href = SLIDES[i];
+          a.download = SLIDES[i].split('/').pop();
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          await new Promise(r => setTimeout(r, 250));
+        }
+        dlBtn.textContent = '✓ ' + SLIDES.length + ' slides baixados';
+        dlBtn.classList.add('btn-ok');
+        setTimeout(() => { dlBtn.textContent = orig; dlBtn.classList.remove('btn-ok'); dlBtn.disabled = false; }, 2400);
+      } catch (e) {
+        dlBtn.textContent = '⚠ Erro — tenta de novo';
+        setTimeout(() => { dlBtn.textContent = orig; dlBtn.disabled = false; }, 2400);
       }
     });
   }
