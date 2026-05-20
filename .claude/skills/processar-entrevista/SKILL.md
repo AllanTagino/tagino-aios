@@ -91,10 +91,16 @@ Filtrar onde `data.cliente` faz match case-insensitive com `<nome-cliente>`.
 Da submissão escolhida, pegar `data`:
 
 ```
-cliente, perfil, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, markdown, timestamp, origem
+cliente, perfil, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10,
+voice_method (opcional — 'pasted'|'typed'|'' — desde 2026-05-20 em diante),
+markdown, timestamp, origem
 ```
 
 Guardar como `ENTREVISTA` pra usar nas próximas fases.
+
+> **Nota sobre `voice_method`:** submissões anteriores a 2026-05-20 (ex: Liege #1) não têm esse campo. Tratar como `""` (desconhecido). Quando vier `"typed"`, marcar contaminação no `preferencias.md` (ver Fase 4).
+
+> **Nota sobre submissões via teste automatizado:** submit via `curl` sem headers de browser (`User-Agent`, `Referer`, `Origin`) cai no Akismet do Netlify e fica invisível pro `listSiteSubmissions` default. Pra teste E2E programático, incluir esses headers. Submissões de cliente real via browser sempre passam — esse cuidado é só pra automação.
 
 ---
 
@@ -174,6 +180,10 @@ Exemplo da escrita real do cliente:
 
 > {q5}
 
+{se voice_method === "typed"}
+**⚠️ voice_sample_contamination_risk: true** — cliente digitou esse exemplo dentro do form em vez de colar de algo real (email, post, DM). Sample pode estar moldado pela tela do form em vez do registro natural. Calibrar tom com cautela e pedir refinamento depois da primeira semana de uso real.
+{fim se}
+
 {se SITE_INFO.tom existir}
 Tom percebido no site: {tom}
 {fim se}
@@ -224,14 +234,25 @@ Pegar o template existente (já no clone) e preencher os campos com base em
 `q9` (texto livre sobre cores/fontes), `q10` (logo) e `SITE_INFO.cores` /
 `SITE_INFO.fontes` se disponíveis.
 
-Se `q9` tem hex codes parsáveis (`#RRGGBB`), distribuir nos slots:
-- Fundo principal: o mais claro
-- Cor de destaque / CTA: o mais saturado
-- Texto principal: o mais escuro
-- Fundo alternativo: secundário claro
+Se `q9` tem hex codes parsáveis (`#RRGGBB`), distribuir nos slots via algoritmo:
 
-Se `q9` é só descrição vaga ("preto e laranja"), preencher como string e
-avisar no resumo final que o design-guide precisa de refinamento manual.
+1. **Extrair todos os hex** com regex `#[0-9A-Fa-f]{6}`. Se 0, pular pro fallback.
+2. **Calcular luminância relativa** de cada (fórmula W3C: `0.2126*R + 0.7152*G + 0.0722*B`, R/G/B normalizados 0-1 com gamma correction). Ordenar do mais claro pro mais escuro.
+3. **Calcular saturação HSL** (`S = (max - min) / (1 - |2L - 1|)` com L = luminância simples). Identificar o mais saturado (excluindo extremos near-black L<0.1 ou near-white L>0.9).
+4. **Distribuir nos slots:**
+   - **Fundo principal** → o mais claro (maior luminância)
+   - **Texto principal** → o mais escuro (menor luminância)
+   - **Cor de destaque / CTA** → o mais saturado entre os restantes
+   - **Fundo alternativo / cards** → 2º mais claro, OU `#FFFFFF` se só tiver 1 claro
+   - **Cor de detalhe secundária** → o que sobrar (geralmente um meio-tom)
+
+**Edge cases:**
+- **1 hex** → tratar como cor de destaque. Resto: fundo `#FAFAF7`, texto `#1A1A1A`, alternativo `#FFFFFF`. Mencionar no resumo: "paleta extraída de 1 cor só — complementares foram preenchidas com neutros, refinar manualmente."
+- **2 hex** → o mais claro vira fundo, o mais escuro vira texto OU destaque (se for saturado). Outros slots: neutros padrão.
+- **5+ hex** → usar os 5 que melhor encaixam (mais claro, mais escuro, mais saturado, 2º mais claro, meio-tom). Ignorar resto e mencionar no resumo final.
+- **Tons quase iguais** (diferença de luminância < 0.05): tratar como duplicada, usar uma só.
+
+Se `q9` é só descrição vaga ("preto e laranja"), preencher como string e avisar no resumo final que o design-guide precisa de refinamento manual.
 
 Se `SITE_INFO.cores` tem hex específicos, usar como sugestão prioritária
 sobre o vago do form.
@@ -242,12 +263,30 @@ Se `q10` menciona arquivo subido ("subi logo.svg"), adicionar nota:
 
 ### `CLAUDE.md`
 
-1. Ler o template do perfil correspondente:
-   `templates/perfis/claude-md-{perfil}.md` (perfil vem de `ENTREVISTA.perfil`,
-   um de: `solopreneur`, `freelancer`, `agencia`, `empresa`)
-2. Substituir os placeholders `[Seu Nome]`, `[nome]`, `[Uma frase...]` etc.
-   com os dados de `ENTREVISTA`
-3. Sobrescrever o `CLAUDE.md` da raiz do workspace recém-criado
+1. Ler o template do perfil correspondente: `templates/perfis/claude-md-{perfil}.md` (perfil vem de `ENTREVISTA.perfil`, um de: `solopreneur`, `freelancer`, `agencia`, `empresa`)
+
+2. **Mapping explícito de placeholders** (substituir cada ocorrência):
+
+| Placeholder no template | Fonte (ENTREVISTA) | Fallback se vazio |
+|---|---|---|
+| `[Seu Nome]` (título) | `q1` | "[a definir]" |
+| `[nome]` (em "Sou [nome]") | `q1` | "[a definir]" |
+| `[Uma frase...]` / `[Uma frase do que essa pasta representa.]` | derivar de `q2` (oferta) | "[Operação do negócio]" |
+| `[O que eu faço em uma frase]` / `[O que sua empresa entrega]` | `q2` | "[a definir]" |
+| `[O que diferencia o meu jeito...]` / `[Posicionamento]` | inferir de `q2` + `q3` (qual gap do mercado o ICP enfrenta) | "[a refinar com cliente nas primeiras sessões]" |
+| `[Quem me acompanha hoje]` / `[Minha audiência]` | `q3` | "[a definir]" |
+| `[tipo de conteúdo 1/2/3]` / `[Principais entregas]` | inferir do contexto (corretor → carrossel + ads + WhatsApp; arquiteto → projeto + render + Insta; etc.) | "[a mapear nas primeiras semanas]" |
+| `[Como você escreve...]` | resumo curto de `q5` (1 frase) | "[ver `_memoria/preferencias.md`]" |
+| `[o que destoa de você]` | resumo curto de `q6` (lista) | "[ver `_memoria/preferencias.md`]" |
+| `[O que você defende. Sua tese.]` | inferir de `q3` + `q7` (qual problema do ICP a oferta resolve) | "[a refinar com cliente]" |
+
+3. **Sempre adicionar** uma seção "## Origem desse workspace" no final do `CLAUDE.md` com:
+   - Data de geração
+   - Cliente e perfil aplicado
+   - URL da submissão (origem)
+   - Pendências conhecidas (logo não copiado, design-guide com warnings, etc.)
+
+4. Sobrescrever o `CLAUDE.md` da raiz do workspace recém-criado.
 
 ---
 
