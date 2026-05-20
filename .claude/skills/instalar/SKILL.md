@@ -61,8 +61,18 @@ Fazer essas perguntas em ordem, esperando a resposta de cada uma antes de seguir
 4. "Você toca sozinho ou tem equipe? Se tem, quantos e cada um fazendo o quê?"
 
 **Sobre voz:**
-5. "Me cola um exemplo da tua escrita — uma legenda do Insta, um email pra cliente, qualquer coisa real e recente. Assim eu calibro o jeito de escrever sem precisar adivinhar."
+5. "Me **cola verbatim** um trecho da tua escrita — um email recente, post, DM, qualquer coisa real que tu já escreveu. **Não digita aqui no chat** — texto digitado agora já tá moldado pela nossa conversa, contamina o sample."
 6. "O que te dá ranço quando alguém escreve assim? (ex: 'vamos juntos!', emoji em email formal, 'caro cliente', jargão de guru, 'alavancar', 'sinergia')"
+
+**Regra dura da Q5 — anti-contamination:**
+
+Se o usuário começar a digitar um exemplo no chat (em vez de colar algo real), pausar e responder:
+
+> "Pausa. Cola direto de algo que tu já escreveu (email, post, DM, draft). Se digitar aqui agora, o sample sai filtrado pela nossa conversa e fica inútil pra calibrar a voz. Essa é a regra que não dobro."
+
+Aceitar paste de qualquer fonte (email/Slack/Insta DM/Notes/whatever). Se o usuário insistir que não tem nada salvo:
+- Registrar `voice_sample_contamination_risk: true` em `_memoria/preferencias.md` (linha no fim da seção "Tom de voz")
+- Calibrar com cautela e revisar o tom depois da primeira semana de uso real
 
 **Sobre foco:**
 7. "Qual o gargalo do teu negócio hoje? O que tá segurando ele de crescer?"
