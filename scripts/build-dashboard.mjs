@@ -31,6 +31,178 @@ const mtime  = (p) => { try { return statSync(p).mtime; } catch { return null; }
 const today  = new Date().toISOString().slice(0, 10);
 const fmtDate = (d) => (d ? d.toISOString().slice(0, 10) : "—");
 
+// ── gallery generator pra carrosseis ──
+// Substitui o listing DOS de pasta quando o usuario clica numa peca
+// de marketing no dashboard. Gera <folder>/gallery.html com o mesmo
+// visual do dashboard (tokens neutros, serif Iowan, sans Inter).
+//
+// Detecta carrossel pela presenca de instagram/slide-*.png OU bg/slide-*.jpg.
+// Idempotente — sempre sobrescreve com a versao mais recente do template.
+const escapeHtml = (s) =>
+  String(s).replace(/[&<>"']/g, (c) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+  }[c]));
+
+const buildCarrosselGallery = (folderAbsPath, folderName) => {
+  // Detectar slides — preferir instagram/ (final export) sobre bg/ (raws)
+  const igDir = join(folderAbsPath, "instagram");
+  const bgDir = join(folderAbsPath, "bg");
+  let slides = [];
+  let slidesDirRel = "";
+  if (exists(igDir)) {
+    slides = lsDir(igDir)
+      .filter((e) => e.isFile() && /\.(png|jpe?g)$/i.test(e.name))
+      .map((e) => e.name)
+      .sort();
+    slidesDirRel = "instagram/";
+  } else if (exists(bgDir)) {
+    slides = lsDir(bgDir)
+      .filter((e) => e.isFile() && /\.(png|jpe?g)$/i.test(e.name))
+      .map((e) => e.name)
+      .sort();
+    slidesDirRel = "bg/";
+  }
+  if (slides.length === 0) return; // nao eh carrossel, pular
+
+  // Legenda (caption pra IG/FB)
+  const legenda = read(join(folderAbsPath, "legenda.md")) || "";
+
+  // Meta
+  const niceName = folderName
+    .replace(/^carrossel[-_]?/i, "")
+    .replace(/[-_]/g, " ")
+    .replace(/\s+\d{4}\s+\d{2}\s+\d{2}$/, ""); // remove data do fim
+  const dateMatch = folderName.match(/(\d{4})[-_](\d{2})[-_](\d{2})/);
+  const dateStr = dateMatch ? `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}` : "";
+  const slideCount = slides.length;
+
+  const slidesHtml = slides
+    .map(
+      (name, i) => `
+      <a class="slide" href="${escapeHtml(slidesDirRel + name)}" target="_blank" rel="noopener" title="Abrir slide ${i + 1} em tamanho cheio">
+        <div class="slide-thumb"><img src="${escapeHtml(slidesDirRel + name)}" alt="Slide ${i + 1}" loading="lazy"></div>
+        <div class="slide-meta"><span class="slide-num">${String(i + 1).padStart(2, "0")}</span><span class="slide-name">${escapeHtml(name)}</span></div>
+      </a>`
+    )
+    .join("");
+
+  const legendaHtml = legenda
+    ? `<pre class="legenda-text" id="legenda-text">${escapeHtml(legenda)}</pre>`
+    : `<div class="legenda-empty">Nenhuma legenda em <code>legenda.md</code> ainda.</div>`;
+
+  const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carrossel · ${escapeHtml(niceName)} · Tagino_AIOS</title>
+<style>
+  :root {
+    --bg: #F5F1E8; --paper: #FBF8F1; --ink: #15140F; --ink-soft: #4A4742; --ink-mute: #8A857B;
+    --line: #E5DECC; --line-soft: #EFEADC; --accent: #6B4A2F; --ok: #4F6B3A;
+    --radius: 4px;
+    --serif: ui-serif, 'Iowan Old Style', 'Georgia', 'Times New Roman', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', system-ui, sans-serif;
+    --mono: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 28px 64px; }
+  .topbar { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; padding-bottom: 22px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+  .brand { display: flex; align-items: baseline; gap: 14px; }
+  .brand-mark { font-family: var(--serif); font-size: 26px; letter-spacing: -0.01em; }
+  .brand-mark .dot { color: var(--accent); }
+  .brand-sub { color: var(--ink-mute); font-size: 12px; font-family: var(--mono); letter-spacing: 0.04em; }
+  .back-link { font-family: var(--mono); font-size: 12px; color: var(--ink-soft); text-decoration: none; padding: 6px 10px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); transition: all 0.15s; }
+  .back-link:hover { color: var(--ink); border-color: var(--ink-mute); }
+  h1 { font-family: var(--serif); font-size: 32px; line-height: 1.15; font-weight: 400; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .kicker { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-mute); margin-bottom: 8px; }
+  .meta-row { display: flex; gap: 18px; color: var(--ink-mute); font-size: 13px; margin-bottom: 32px; }
+  .meta-row span strong { color: var(--ink); font-weight: 500; }
+  .section-head { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: var(--ink-mute); margin: 36px 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line-soft); }
+  .slides-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 8px; }
+  @media (max-width: 760px) { .slides-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .slides-grid { grid-template-columns: 1fr; } }
+  .slide { display: block; text-decoration: none; color: inherit; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; transition: all 0.15s; }
+  .slide:hover { border-color: var(--ink-mute); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21,20,15,0.06); }
+  .slide-thumb { background: #fff; aspect-ratio: 1080 / 1350; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .slide-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .slide-meta { display: flex; align-items: baseline; gap: 10px; padding: 10px 12px; border-top: 1px solid var(--line); background: var(--paper); font-family: var(--mono); font-size: 11px; }
+  .slide-num { color: var(--accent); font-weight: 600; }
+  .slide-name { color: var(--ink-mute); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .legenda-card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; margin-bottom: 8px; }
+  .legenda-text { font-family: var(--sans); font-size: 14px; line-height: 1.55; color: var(--ink); white-space: pre-wrap; word-wrap: break-word; margin: 0; }
+  .legenda-empty { color: var(--ink-mute); font-style: italic; font-size: 13px; }
+  .legenda-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-soft); }
+  .btn { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; padding: 8px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--bg); color: var(--ink-soft); cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+  .btn:hover { color: var(--ink); border-color: var(--ink-mute); }
+  .btn-ok { color: var(--ok); border-color: var(--ok); }
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .footer { margin-top: 48px; padding-top: 18px; border-top: 1px solid var(--line); color: var(--ink-mute); font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">Tagino_AIOS<span class="dot">.</span></div>
+      <div class="brand-sub">— produção</div>
+    </div>
+    <a class="back-link" href="../../../dashboard/index.html">← voltar ao dashboard</a>
+  </div>
+
+  <div class="kicker">Carrossel</div>
+  <h1>${escapeHtml(niceName)}</h1>
+  <div class="meta-row">
+    <span><strong>${slideCount}</strong> slides</span>
+    ${dateStr ? `<span><strong>${escapeHtml(dateStr)}</strong> · data</span>` : ""}
+    <span><strong>Instagram</strong> · 1080×1350</span>
+  </div>
+
+  <div class="section-head">Slides</div>
+  <div class="slides-grid">${slidesHtml}
+  </div>
+
+  <div class="section-head">Legenda</div>
+  <div class="legenda-card">
+    ${legendaHtml}
+    ${legenda ? `<div class="legenda-actions"><button class="btn" id="copy-btn" type="button">📋 Copiar legenda</button></div>` : ""}
+  </div>
+
+  <div class="section-head">Ações</div>
+  <div class="actions">
+    <a class="btn" href="." target="_blank" rel="noopener">📂 Abrir pasta</a>
+    <a class="btn" href="../../../dashboard/index.html">← Voltar ao dashboard</a>
+  </div>
+
+  <div class="footer">gerado por scripts/build-dashboard.mjs · ${today}</div>
+</div>
+<script>
+  const btn = document.getElementById('copy-btn');
+  const txt = document.getElementById('legenda-text');
+  if (btn && txt) {
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(txt.textContent || '');
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copiado';
+        btn.classList.add('btn-ok');
+        setTimeout(() => { btn.textContent = orig; btn.classList.remove('btn-ok'); }, 1800);
+      } catch (e) {
+        btn.textContent = '⚠ Erro';
+        setTimeout(() => { btn.textContent = '📋 Copiar legenda'; }, 1800);
+      }
+    });
+  }
+</script>
+</body>
+</html>
+`;
+
+  writeFileSync(join(folderAbsPath, "gallery.html"), html);
+};
+
 // ── CLAUDE.md ──
 const claude = read(join(ROOT, "CLAUDE.md")) || "";
 
@@ -271,7 +443,17 @@ for (const t of tplFiles) {
 }
 
 // ── output (saidas/, marketing/conteudo/, site/) ──
+// Pra cada peça produzida calculamos um `viewUrl` que aponta pra
+// preview decente em vez de jogar o usuario num listing DOS de pasta:
+//   1. gallery.html (gerada por nos pra carrosseis — ver buildGallery)
+//   2. index.html (ja existe pra sites/landings)
+//   3. folder/ (fallback DOS)
 const output = [];
+const resolveViewUrl = (folderAbsPath, relPath) => {
+  if (exists(join(folderAbsPath, "gallery.html"))) return relPath + "gallery.html";
+  if (exists(join(folderAbsPath, "index.html"))) return relPath + "index.html";
+  return relPath;
+};
 const scanFlat = (dir, type) => {
   const base = join(ROOT, dir);
   if (!exists(base)) return;
@@ -280,10 +462,12 @@ const scanFlat = (dir, type) => {
     const full = join(base, entry.name);
     let path = `${dir}/${entry.name}`;
     if (entry.isDirectory()) path += "/";
+    const viewUrl = entry.isDirectory() ? resolveViewUrl(full, path) : path;
     output.push({
       type,
       name: entry.name.replace(/[-_]/g, " ").replace(/\.[a-z]+$/i, ""),
       path,
+      viewUrl,
       date: fmtDate(mtime(full)),
     });
   }
@@ -294,11 +478,17 @@ if (exists(marketingConteudo)) {
   for (const entry of lsDir(marketingConteudo)) {
     if (entry.name.startsWith(".")) continue;
     if (entry.isDirectory()) {
+      const full = join(marketingConteudo, entry.name);
+      // Auto-gera gallery.html pra carrosseis (detecta por presenca
+      // de instagram/slide-*.png ou bg/slide-*.jpg)
+      buildCarrosselGallery(full, entry.name);
+      const relPath = `marketing/conteudo/${entry.name}/`;
       output.push({
         type: "Marketing",
         name: entry.name.replace(/[-_]/g, " "),
-        path: `marketing/conteudo/${entry.name}/`,
-        date: fmtDate(mtime(join(marketingConteudo, entry.name))),
+        path: relPath,
+        viewUrl: resolveViewUrl(full, relPath),
+        date: fmtDate(mtime(full)),
       });
     }
   }
