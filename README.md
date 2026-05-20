@@ -4,8 +4,8 @@
 
 Você acaba de instalar o Tagino_AIOS. Em alguns minutos, sua empresa
 tem memória própria, identidade visual aplicada em tudo que o sistema
-gerar, 19 skills prontas pra marketing, SEO, ads, mídia e operação, e
-um dashboard local pra ver o estado do sistema num olhar.
+gerar, **23 skills** prontas pra marketing, SEO, ads, mídia e operação,
+e um dashboard local pra ver o estado num olhar.
 
 Bora voar.
 
@@ -31,7 +31,7 @@ só responde.
 
 ```
 git clone https://github.com/AllanTagino/tagino-aios.git
-cd Tagino_AIOS
+cd tagino-aios
 code .
 ```
 
@@ -39,23 +39,30 @@ Na janela do VS Code que abrir: terminal integrado → `claude` → `/instalar`.
 
 ---
 
-Quando o `/instalar` terminar, renomeia a pasta `Tagino_AIOS/` pro nome do teu
-negócio (fecha o VS Code, renomeia no Explorer/Finder, abre de novo). A
-pasta não fica como "Tagino_AIOS" — ela é o teu negócio agora.
+Quando o `/instalar` terminar, renomeia a pasta `tagino-aios/` pro nome do
+teu negócio (fecha o VS Code, renomeia no Explorer/Finder, abre de novo).
+A pasta não fica como "tagino-aios" — ela é o teu negócio agora.
 
-O `/instalar` roda uma vez só. Te entrevista sobre o negócio, monta a
-memória e configura o sistema. Depois disso, é só usar.
+O `/instalar` te entrevista sobre o negócio, monta o `intake.md`
+(source-of-truth), e deriva memória + identidade + `CLAUDE.md` a partir
+dele. **Idempotente** — pra atualizar contexto depois, edita `intake.md`
+e roda `/instalar` de novo.
 
 ---
 
-## O sistema
+## O sistema — 23 skills
 
 **Núcleo** — o jeito de operar o dia a dia
-`/abrir` carrega o contexto antes de cada sessão de trabalho · `/salvar`
-faz commit + push no GitHub · `/atualizar` varre o projeto e atualiza
-a memória · `/novo-projeto` cria pasta isolada pra cada cliente ou
-iniciativa · `/mapear-rotinas` descobre o que você repete e transforma
-em skill personalizada.
+`/instalar` setup inicial idempotente via `intake.md` · `/abrir` carrega
+o contexto antes de cada sessão de trabalho · `/salvar` faz commit + push
+no GitHub · `/atualizar` varre o projeto e atualiza a memória ·
+`/novo-projeto` cria pasta isolada pra cada cliente ou iniciativa ·
+`/mapear-rotinas` descobre o que você repete e transforma em skill
+personalizada · `/processar-entrevista` puxa submissão do hub web e
+cria workspace populado · `/conectar` wizard de API keys (OpenAI,
+Anthropic, Apify, Higgsfield) com validação · `/decidir` registra
+decisão importante em `decisions/log.md` append-only · `/audit` score
+100pts do workspace em 4 eixos.
 
 **Conteúdo e SEO** — vitrine pública da empresa
 `/carrossel` cria carrosséis 1080×1350 com identidade da marca (com ou
@@ -91,6 +98,51 @@ API key.
 
 ---
 
+## Como o Tagino_AIOS pensa
+
+### `intake.md` — source-of-truth editável
+
+Na raiz do workspace fica o `intake.md` com as **10 respostas da entrevista**
+em formato editável. É o único arquivo que tu precisa mexer pra atualizar
+o contexto do negócio (cliente mudou foco, mudou ICP, mudou paleta, etc.):
+
+1. Edita a Q correspondente no `intake.md`
+2. Roda `/instalar` de novo
+3. `_memoria/*.md` + `identidade/design-guide.md` + `CLAUDE.md` regeneram a
+   partir dele — idempotente
+
+Edição direta nos `_memoria/*.md` é sobrescrita na próxima run do `/instalar`.
+Pra correção pontual sem regeneração, conversa com o Claude (mecanismo
+"Aprender com correções" do `CLAUDE.md`).
+
+### `_memoria/` — o cérebro
+
+Tudo que importa do seu negócio mora aqui — quem é a empresa, como ela fala,
+o que tá em foco essa semana. **Derivado do `intake.md`** pelo `/instalar`.
+O Claude lê isso antes de cada resposta. Quanto melhor a memória, melhor o
+sistema.
+
+### `identidade/` — o rosto
+
+Cores, fontes, logo, padrão visual. Todo carrossel, slide, peça que o
+sistema gera respeita isso. **Derivado do `intake.md` Q9 (paleta) e Q10
+(logo)** pelo `/instalar`.
+
+### `decisions/log.md` — memória institucional
+
+Decisões importantes do negócio (mudou paleta, descontinuou serviço,
+trocou fornecedor, mudou pricing) ficam num arquivo **append-only**.
+Skill `/decidir` adiciona entries com estrutura `contexto + decisão +
+por quê + impacto`. Skills futuras (`/atualizar`, `/audit`,
+`/mapear-rotinas`) leem o log pra contexto histórico — resolve o problema
+de "tomamos essa decisão há 3 meses e ninguém lembra por quê".
+
+### `marketing/`, `saidas/`, `scripts/` — o resultado
+
+O sistema produz, versiona no GitHub, fica tudo seu.
+
+---
+
 ## Dashboard local
 
 Abre o `dashboard.html` na raiz do projeto (duplo-clique, sem servidor,
@@ -102,6 +154,10 @@ Meta Ads, Google Ads, Calendar) podem ser conectadas.
 O dashboard se popula sozinho via `node scripts/build-dashboard.mjs` —
 scan do workspace inteiro pra gerar `dashboard/data.js`. Cada workspace
 tem o seu, gitignored. Detalhes em [`dashboard/README.md`](dashboard/README.md).
+
+Pra ver o **score do workspace** (0-100 em 4 eixos: Memória, Identidade,
+Operação, Cadência) com top 3 gaps por leverage, roda `/audit` no Claude.
+Recomendado semanal — número que sobe = sistema melhorando.
 
 ---
 
@@ -120,24 +176,40 @@ O sistema não substitui você. Vira parte da sua empresa.
 
 ---
 
-## Como o Tagino_AIOS pensa
+## Entrevista web pra cliente que não usa Claude
 
-`_memoria/` é o cérebro. Tudo que importa do seu negócio mora aqui —
-quem é a empresa, como ela fala, o que tá em foco essa semana. O Claude
-lê isso antes de cada resposta. Quanto melhor a memória, melhor o sistema.
+Tagino_AIOS é o sistema operacional pra quem **vai usar Claude Code**. Pra
+atender clientes que **não vão usar Claude**, tem uma entrevista web que
+roda em qualquer browser e captura as respostas via Netlify Forms:
 
-`identidade/` é o rosto. Cores, fontes, logo, padrão visual. Todo
-carrossel, slide, peça que o sistema gera respeita isso.
+→ **URL:** https://tagino-aios-entrevista.netlify.app/?cliente=Nome
+→ **Repo:** [tagino-entrevista-hub](https://github.com/AllanTagino/tagino-entrevista-hub) (privado)
 
-`marketing/`, `saidas/` e `scripts/` são o resultado. O sistema produz,
-versiona no GitHub, fica tudo seu.
+O cliente preenche as 10 perguntas no browser → Allan recebe a submissão
+no painel Netlify Forms → roda **`/processar-entrevista <Nome>`** no Claude
+Code → workspace local é criado em `~/CLAUDE/tagino-<slug>/` com
+`intake.md` + `_memoria/*.md` + `identidade/design-guide.md` + `CLAUDE.md`
+populados, pronto pra usar. Loop fechado em <2 min do tempo do Allan.
+
+Pra quem quiser montar o próprio hub web, é um único `public/index.html`
++ `deploy.ps1` no Netlify. Clone, customize o `CLIENTES` map, deploya.
 
 ---
 
-## Entrevista web pra cliente que não usa Claude
+## Stack e dependências
 
-Tagino_AIOS é o sistema operacional pra quem **vai usar Claude Code**. Pra atender clientes que **não vão usar Claude**, montei uma entrevista web separada que roda em qualquer browser e captura as respostas via Netlify Forms:
+- **Claude Code** (CLI) — runtime das skills
+- **Git** — versionamento + sync com GitHub
+- **Node.js** (≥18) — para o `dashboard/build-dashboard.mjs` e Playwright dos carrosséis
+- **Python** (≥3.10) — para `/transcrever-audio` (faster-whisper) e `/analisar-dados`
+- **ffmpeg** — para `/comprimir-video`
+- **netlify-cli** (opcional) — para `/processar-entrevista` puxar submissões do hub
 
-→ Repo do hub: **[tagino-entrevista-hub](https://github.com/AllanTagino/tagino-entrevista-hub)** (privado, é o meu setup)
+Chaves de API opcionais (configuradas via `/conectar`):
+- `OPENAI_API_KEY` — gera foto IA no `/carrossel` Tipo 2
+- `ANTHROPIC_API_KEY` — só se uma skill chamar Claude API diretamente (raro)
+- `HIGGSFIELD_API_KEY` — skills `higgsfield-*` (geração de imagem/vídeo premium)
+- `APIFY_API_TOKEN` — scrapers customizados
 
-Pra quem quiser montar uma própria, o hub é um único `public/index.html` + `deploy.ps1` no Netlify. Clone, customize o `CLIENTES` map, deploya.
+MCPs típicos (configurados via `claude mcp add ...`): Instagram, WhatsApp,
+Meta Ads, Google Ads, Google Calendar, Google Drive.
