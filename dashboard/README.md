@@ -1,6 +1,6 @@
 # Dashboard
 
-Painel local do Tagino_IOS — abre com duplo-clique, mostra o estado atual
+Painel local do Tagino_AIOS — abre com duplo-clique, mostra o estado atual
 do workspace numa página única.
 
 ## Como abrir

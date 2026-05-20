@@ -1,6 +1,6 @@
-# marketing/ — saídas do Tagino_IOS
+# marketing/ — saídas do Tagino_AIOS
 
-Tudo que as skills de marketing produzem cai aqui. Skills do Tagino_IOS já sabem onde salvar — você raramente precisa criar pasta manualmente.
+Tudo que as skills de marketing produzem cai aqui. Skills do Tagino_AIOS já sabem onde salvar — você raramente precisa criar pasta manualmente.
 
 ## Estrutura padrão
 

@@ -1,6 +1,6 @@
 # Identidade — Agência de Performance
 
-> Identidade visual que rodou em cliente real do Tagino_IOS — agência de
+> Identidade visual que rodou em cliente real do Tagino_AIOS — agência de
 > performance, tom direto, sem decoração. Adapta a tua em `identidade/design-guide.md`.
 
 ---

@@ -1,4 +1,4 @@
-# saidas/ — outputs gerais do Tagino_IOS
+# saidas/ — outputs gerais do Tagino_AIOS
 
 Pasta pra qualquer output que não é marketing puro (não cabe em `marketing/`).
 
