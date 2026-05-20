@@ -1,12 +1,12 @@
 ---
 name: conectar
 description: >
-  Wizard pra configurar chave de API de qualquer serviço externo (OpenAI, Anthropic,
-  Apify, Higgsfield e outros) sem o usuário precisar editar `.env` à mão. Pede a chave
-  no chat, **valida com test call ao serviço**, grava no `.env` da raiz, garante que
-  `.gitignore` cobre o arquivo. Use quando o usuário disser "conectar openai", "configurar
-  chave da X", "/conectar", "como adiciono minha API key", ou quando outra skill falhar
-  por falta de chave (ex: `/carrossel` tipo 2 pediu OpenAI).
+  Wizard pra configurar chave de API de qualquer serviço externo (kie.ai/Nano Banana,
+  OpenAI, Anthropic, Apify e outros) sem o usuário precisar editar `.env` à mão. Pede
+  a chave no chat, **valida com test call ao serviço**, grava no `.env` da raiz, garante
+  que `.gitignore` cobre o arquivo. Use quando o usuário disser "conectar openai",
+  "configurar chave da X", "/conectar", "como adiciono minha API key", ou quando outra
+  skill falhar por falta de chave (ex: `/image-enhancer-aios` pediu kie.ai).
 ---
 
 # /conectar — Wizard de API keys com validação
@@ -31,7 +31,7 @@ Adicionar com `Edit`, então seguir.
 
 ### 2. Argumento
 
-Aceita `<servico>` opcional como argumento. Serviços conhecidos: `openai`, `anthropic`, `apify`, `higgsfield`. Se vier qualquer outro nome ou `outro`, segue fluxo genérico.
+Aceita `<servico>` opcional como argumento. Serviços conhecidos: `kieai`, `openai`, `anthropic`, `apify`. Se vier qualquer outro nome ou `outro`, segue fluxo genérico.
 
 Sem argumento → listar os 4 + "outro" e perguntar qual.
 
@@ -40,6 +40,21 @@ Sem argumento → listar os 4 + "outro" e perguntar qual.
 ## Cards de serviços conhecidos
 
 Cada card define: nome bonito · var name · onde pegar a chave · como validar.
+
+### `kieai`
+
+| Campo | Valor |
+|---|---|
+| Nome | kie.ai (Nano Banana Pro / Gemini 2.5 Flash Image) |
+| Variável | `KIE_API_KEY` |
+| Formato esperado | hex string ~32 chars (sem prefixo padrão) |
+| Onde pegar | https://kie.ai/api-key |
+| Pré-requisito | Conta no kie.ai com créditos (pay-as-you-go, ~$0.09 por imagem 2K) |
+| Test endpoint | `GET https://api.kie.ai/api/v1/chat/credit` (consulta saldo, não consome) |
+| Header | `Authorization: Bearer <chave>` |
+| Sucesso | HTTP 200 com `{"code":200,"data":{...credit info...}}` |
+| Erros | 401/code≠200 = inválida · saldo 0 = primeira call vai falhar (avisar) |
+| Usado por | `scripts/nano-banana-enhance.py` + skill `/image-enhancer-aios` |
 
 ### `openai`
 
@@ -83,16 +98,6 @@ Cada card define: nome bonito · var name · onde pegar a chave · como validar.
 | Erros | 401 = inválida |
 | Usado por | Scrapers customizados, eventualmente skill que use Apify direto |
 
-### `higgsfield`
-
-| Campo | Valor |
-|---|---|
-| Nome | Higgsfield (imagens/vídeos premium) |
-| Variável | `HIGGSFIELD_API_KEY` |
-| Onde pegar | console do Higgsfield (skill `/higgsfield-generate` documenta) |
-| Test endpoint | Verificar na doc do Higgsfield no momento — se houver dúvida, pular validação e gravar com warning "não validei contra o serviço, primeira chamada vai dizer se funciona" |
-| Usado por | Skills `higgsfield-*` (geralmente disponíveis como plugin) |
-
 ### `outro`
 
 Fluxo genérico — pra quando o serviço não tá nos cards acima:
@@ -112,10 +117,10 @@ Fluxo genérico — pra quando o serviço não tá nos cards acima:
 Se argumento `<servico>` veio, ir direto pro card. Senão:
 
 > "Que serviço você quer conectar?
-> 1. OpenAI (gera fotos IA, transcrições) — `OPENAI_API_KEY`
-> 2. Anthropic (Claude API direto) — `ANTHROPIC_API_KEY`
-> 3. Apify (web scraping) — `APIFY_API_TOKEN`
-> 4. Higgsfield (imagens/vídeos) — `HIGGSFIELD_API_KEY`
+> 1. kie.ai (Nano Banana Pro — enhance/edit imagens) — `KIE_API_KEY`
+> 2. OpenAI (gera fotos IA, transcrições) — `OPENAI_API_KEY`
+> 3. Anthropic (Claude API direto) — `ANTHROPIC_API_KEY`
+> 4. Apify (web scraping) — `APIFY_API_TOKEN`
 > 5. Outro (qualquer chave simples)"
 
 ### Passo 2 — Onde pegar (orientação)
@@ -186,10 +191,10 @@ except Exception as e:
 
 Baseado no serviço, dizer o que destrava:
 
+- kie.ai → "Agora `/image-enhancer-aios` + `scripts/nano-banana-enhance.py` rodam. Próximo: `pip install -r scripts/requirements.txt` (uma vez só)."
 - OpenAI → "Agora `/carrossel` aceita Tipo 2 (foto IA). Tenta com qualquer tema."
 - Anthropic → "Skills que chamam Claude API direta agora funcionam."
 - Apify → "Scrapers customizados podem usar essa chave."
-- Higgsfield → "Skills `higgsfield-*` agora têm acesso."
 - Outro → "Qualquer skill que ler `process.env.VAR` agora encontra."
 
 ---
@@ -227,9 +232,22 @@ Baseado no serviço, dizer o que destrava:
 ```
 > /conectar
 "Que serviço?
- 1. OpenAI · 2. Anthropic · 3. Apify · 4. Higgsfield · 5. Outro"
+ 1. kie.ai · 2. OpenAI · 3. Anthropic · 4. Apify · 5. Outro"
 [1]
-[segue caso 1]
+[segue caso 2b]
+```
+
+**Caso 2b — kie.ai (Nano Banana Pro):**
+
+```
+> /conectar kieai
+"kie.ai (Nano Banana Pro). Pega a chave em https://kie.ai/api-key
+ — cobra pay-as-you-go (~$0.09 por imagem 2K). Cola aqui:"
+[cliente cola a chave]
+"Testando saldo..."
+"✓ Válida. Gravado: KIE_API_KEY=...XXXX em .env (gitignored)."
+"Agora `/image-enhancer-aios` + `scripts/nano-banana-enhance.py` rodam.
+ Próximo: `pip install -r scripts/requirements.txt` (uma vez só)."
 ```
 
 **Caso 3 — chave errada:**

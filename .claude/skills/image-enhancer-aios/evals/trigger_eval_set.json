@@ -1,0 +1,82 @@
+[
+  {
+    "query": "ok received the render from the architect for the new tower in vila madalena, its a lobby shot but feels really sterile and empty. can you help me write a prompt to make it feel more brazilian and lived-in? im going to run it through nano banana",
+    "should_trigger": true
+  },
+  {
+    "query": "tenho um render aqui da varanda gourmet do projeto da liege, precisa ficar com cara de revista, brasileiro, com pessoas reais usando o espaço. me da um prompt pra eu rodar no nano banana",
+    "should_trigger": true
+  },
+  {
+    "query": "ImageEnhancerAIOS turn this rooftop pool render into something a buyer in jardins would actually want to live at. preserve everything, just add brazilian life",
+    "should_trigger": true
+  },
+  {
+    "query": "the marketing team needs this academia/wellness studio render to feel less like an institutional gym and more like a high-end residential amenity. its an empty space right now, can you write the edit prompt? attached",
+    "should_trigger": true
+  },
+  {
+    "query": "i have 4 renders to humanize for the catarina project — facade, lobby, party room, and rooftop pool. lets start with the lobby (i'll send the image). same brazilian editorial style across all",
+    "should_trigger": true
+  },
+  {
+    "query": "render do living tá tudo mobiliado mas tá vazio de gente. queria adicionar familia tomando café da tarde estilo editorial brasileiro. me ajuda com o prompt pro nano banana, mantendo a câmera",
+    "should_trigger": true
+  },
+  {
+    "query": "this exterior shot of the building has the camera angle locked perfect, just need brazilian-market cars and pedestrians, not european ones. write me a nano banana edit prompt",
+    "should_trigger": true
+  },
+  {
+    "query": "fresh render from kingstone for the gym amenity at the icaraí building. need yoga people, brazilian residents, dont change the architecture or equipment layout. write the prompt",
+    "should_trigger": true
+  },
+  {
+    "query": "got a churrasqueira shot here that needs people grilling, drinks at the bar area, maybe a chef. preserve the layout exactly, just add life. nano banana prompt please",
+    "should_trigger": true
+  },
+  {
+    "query": "i'm presenting to the ludmila client tomorrow morning and this rooftop render has zero atmosphere — totally empty, no people, no plants enhanced. can you generate me the edit prompt to send through nano banana with brazilian lifestyle styling?",
+    "should_trigger": true
+  },
+  {
+    "query": "can you generate a logo for our new real estate brand 'Habita Coliving'? something modern in terracotta tones, ideally vector format with a clean wordmark",
+    "should_trigger": false
+  },
+  {
+    "query": "i need to optimize the file size of these construction site photos before uploading to the dropbox client portal. they're around 8mb each and the client is on slow internet",
+    "should_trigger": false
+  },
+  {
+    "query": "write a property listing for this 3-bedroom apartment in moema. 95m2, sun-facing, balcony with city view, just renovated wooden floors. portuguese please, with brazilian luxury market tone",
+    "should_trigger": false
+  },
+  {
+    "query": "converting a classy closets cad pdf into a higgsfield render prompt. its a master walk-in closet with built-in cabinetry. need the analyst director to review the dimensions first",
+    "should_trigger": false
+  },
+  {
+    "query": "make a 15-second instagram reel from this 8-image carousel of the icaraí project — kling i2v, brazilian samba background music, slow camera movement",
+    "should_trigger": false
+  },
+  {
+    "query": "search for the most recent commits on the cabinet-pdf-to-prompts skill, i need to know what changed in the last week. specifically looking for director_lessons updates",
+    "should_trigger": false
+  },
+  {
+    "query": "convert these arch viz renders from .tiff to .jpg with maximum quality preservation, target around 2mb per file. batch the whole folder if possible",
+    "should_trigger": false
+  },
+  {
+    "query": "i need to write the technical specs for our parking garage waterproofing on this report. ABNT-compliant format, references to NBR 9575 and current 2026 standards",
+    "should_trigger": false
+  },
+  {
+    "query": "create a 3d sketchup model of this lobby from the floor plan im sending. need it for the architect meeting friday, just blocky volumes is fine",
+    "should_trigger": false
+  },
+  {
+    "query": "the render i sent earlier needs to be cropped to 16:9 for the meta ads campaign and also a square version for instagram feed. can you crop and resize it for me?",
+    "should_trigger": false
+  }
+]
