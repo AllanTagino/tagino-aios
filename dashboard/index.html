@@ -813,8 +813,8 @@
         <span class="card-kicker">identidade/design-guide.md</span>
       </div>
       <div class="identity-banner" id="id-banner">
-        <span class="id-pill" id="id-pill">LISBÔ</span>
-        <div class="id-title" id="id-title">lisbô<span style="color:#0F0F0E">.</span></div>
+        <span class="id-pill" id="id-pill"></span>
+        <div class="id-title" id="id-title"></div>
         <div class="id-sub" id="id-sub">paleta · tipografia · espírito</div>
       </div>
       <div class="swatches" id="swatches"></div>
@@ -1242,6 +1242,14 @@ DATA.setup.forEach(s => {
   a.appendChild(row);
   mem.appendChild(a);
 });
+
+/* Identidade — brand banner (pill + title dinamicos do owner) */
+const brand = DATA.identity.brand || { pill: "SUA MARCA", title: "sua marca" };
+$("#id-pill").textContent = brand.pill;
+const idTitle = $("#id-title");
+idTitle.textContent = "";
+idTitle.appendChild(document.createTextNode(brand.title));
+idTitle.appendChild(el("span", { style: "color:#0F0F0E" }, "."));
 
 /* Identidade — swatches */
 const sw = $("#swatches");

@@ -45,15 +45,16 @@ const profile =
   matchOne(/Perfil aplicado:\s*([^\n.]+)/i) ||
   "—";
 
-// Owner + headline: o template tem o H1 "Tagino_AIOS — Sistema operacional do negócio";
-// o /instalar adiciona um segundo H1 com nome do usuário/projeto. Pegar esse segundo.
+// Owner + headline: o /instalar pode deixar 1 ou 2 H1s no CLAUDE.md.
+// Caso A — template original intacto: H1[0] = "Tagino_AIOS — Sistema..." + H1[1] = "<Owner> — ..."
+// Caso B — /instalar reescreveu o H1 original: existe só H1[0] = "<Owner> — ..."
+// Filtra qualquer H1 que casa com o template generico e pega o primeiro restante.
 let owner = "—";
-let userHeading = "";
 const headings = [...claude.matchAll(/(?:^|\n)# ([^\n]+)/g)].map((m) => m[1].trim());
-if (headings.length >= 2) {
-  userHeading = headings[1];
-  // Estrutura típica: "<Owner> — <System> · <Contexto>" ou "<Owner> · <Contexto>"
-  owner = userHeading.split(/\s+[—·]\s+/)[0].trim();
+const candidates = headings.filter((h) => !/Tagino_?AIOS\s*[—-]\s*Sistema/i.test(h));
+if (candidates.length > 0) {
+  // Estrutura tipica: "<Owner> — <System> · <Contexto>" ou "<Owner> · <Contexto>"
+  owner = candidates[0].split(/\s+[—·]\s+/)[0].trim();
 }
 
 // ── workspace ──
@@ -62,6 +63,7 @@ const workspaceName = basename(ROOT);
 // Lead: primeiro parágrafo descritivo após o H1 do usuário (não o do template).
 // Aceita callouts (`>`), só remove o marcador.
 let lead = "";
+const userHeading = candidates[0] || "";
 if (userHeading) {
   const idx = claude.indexOf("# " + userHeading);
   if (idx >= 0) {
@@ -157,8 +159,12 @@ const swatches =
         { name: "Cor 5", hex: "#A89F87", role: "Aguardando identidade" },
       ];
 
-const wordmarkSample =
-  owner !== "—" ? owner.split(/\s+/)[0].toUpperCase() : "SUA MARCA";
+const brandToken = owner !== "—" ? owner.split(/\s+/)[0] : "";
+const wordmarkSample = brandToken ? brandToken.toUpperCase() : "SUA MARCA";
+const brand = {
+  pill: brandToken ? brandToken.toUpperCase() : "SUA MARCA",
+  title: brandToken ? brandToken.toLowerCase() : "sua marca",
+};
 
 // ── strategy ──
 const estrat = read(join(ROOT, "_memoria/estrategia.md")) || "";
@@ -340,6 +346,7 @@ const data = {
   workspace: { name: workspaceName, profile, owner, today, headline, lead },
   setup,
   identity: {
+    brand,
     swatches,
     type: [
       { key: "Display",  sample: "Tipografia da sua marca.",                                family: "serif" },
