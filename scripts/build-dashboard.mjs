@@ -11,9 +11,37 @@
  */
 import { readFileSync, readdirSync, statSync, writeFileSync, existsSync } from "node:fs";
 import { join, basename } from "node:path";
+import { execFileSync } from "node:child_process";
+import { platform } from "node:os";
 
 const ROOT = process.cwd();
 const log = (m) => process.stdout.write(m + "\n");
+
+// ── ZIP helper ──
+// Browsers refusam download attribute em file:// origin, entao bulk
+// download nao funciona. Solucao: pre-empacotar slides em .zip que
+// o browser nao consegue exibir inline e portanto baixa.
+// Windows: usa PowerShell Compress-Archive (built-in, sem dep externa).
+// Mac/Linux: tenta `zip` (geralmente instalado).
+const makeZip = (sourceFiles, zipPath) => {
+  if (sourceFiles.length === 0) return false;
+  try {
+    if (platform() === "win32") {
+      const args = [
+        "-NoProfile", "-NonInteractive", "-Command",
+        `Compress-Archive -Path @(${sourceFiles.map((f) => `'${f.replace(/'/g, "''")}'`).join(",")}) -DestinationPath '${zipPath.replace(/'/g, "''")}' -Force`,
+      ];
+      execFileSync("powershell", args, { stdio: "pipe" });
+    } else {
+      // -j junk paths (so o filename, sem estrutura de pasta)
+      execFileSync("zip", ["-j", "-q", zipPath, ...sourceFiles], { stdio: "pipe" });
+    }
+    return true;
+  } catch (e) {
+    log(`  ⚠ ZIP falhou: ${e.message}`);
+    return false;
+  }
+};
 
 // ── helpers ──
 // Normaliza BOM (UTF-8 BOM em arquivos editados no Windows) e CRLF → LF
@@ -63,6 +91,13 @@ const buildCarrosselGallery = (folderAbsPath, folderName) => {
     slidesDirRel = "bg/";
   }
   if (slides.length === 0) return; // nao eh carrossel, pular
+
+  // Empacota slides num .zip pra download confiavel (browsers nao
+  // baixam multiplos arquivos de file:// origin)
+  const slidesAbsDir = join(folderAbsPath, slidesDirRel);
+  const slideAbsPaths = slides.map((s) => join(slidesAbsDir, s));
+  const zipPath = join(folderAbsPath, "slides.zip");
+  const zipOk = makeZip(slideAbsPaths, zipPath);
 
   // Legenda (caption pra IG/FB)
   const legenda = read(join(folderAbsPath, "legenda.md")) || "";
@@ -170,14 +205,14 @@ const buildCarrosselGallery = (folderAbsPath, folderName) => {
   <div class="legenda-card">
     ${legendaHtml}
     ${legenda ? `<div class="legenda-actions">
-      <a class="btn" href="legenda.md" download="legenda.txt">📥 Baixar .txt</a>
+      <button class="btn" id="download-legenda-btn" type="button">📥 Baixar .txt</button>
       <button class="btn" id="copy-btn" type="button">📋 Copiar legenda</button>
     </div>` : ""}
   </div>
 
   <div class="section-head">Ações</div>
   <div class="actions">
-    <button class="btn btn-primary" id="download-all-btn" type="button">📥 Baixar todos os slides (${slideCount})</button>
+    ${zipOk ? `<a class="btn btn-primary" href="slides.zip" download="${escapeHtml(folderName)}-slides.zip">📥 Baixar slides (.zip · ${slideCount} arquivos)</a>` : `<button class="btn" id="download-fallback" type="button" disabled title="ZIP nao foi gerado nesse build">📥 ZIP indisponivel — abre a pasta</button>`}
     <a class="btn" href="." target="_blank" rel="noopener">📂 Abrir pasta</a>
     <a class="btn" href="../../../dashboard/index.html">← Voltar ao dashboard</a>
   </div>
@@ -186,49 +221,41 @@ const buildCarrosselGallery = (folderAbsPath, folderName) => {
 </div>
 <script>
   // Copiar legenda pro clipboard
-  const btn = document.getElementById('copy-btn');
   const txt = document.getElementById('legenda-text');
-  if (btn && txt) {
-    btn.addEventListener('click', async () => {
+  const copyBtn = document.getElementById('copy-btn');
+  if (copyBtn && txt) {
+    copyBtn.addEventListener('click', async () => {
       try {
         await navigator.clipboard.writeText(txt.textContent || '');
-        const orig = btn.textContent;
-        btn.textContent = '✓ Copiado';
-        btn.classList.add('btn-ok');
-        setTimeout(() => { btn.textContent = orig; btn.classList.remove('btn-ok'); }, 1800);
+        const orig = copyBtn.textContent;
+        copyBtn.textContent = '✓ Copiado';
+        copyBtn.classList.add('btn-ok');
+        setTimeout(() => { copyBtn.textContent = orig; copyBtn.classList.remove('btn-ok'); }, 1800);
       } catch (e) {
-        btn.textContent = '⚠ Erro';
-        setTimeout(() => { btn.textContent = '📋 Copiar legenda'; }, 1800);
+        copyBtn.textContent = '⚠ Erro';
+        setTimeout(() => { copyBtn.textContent = '📋 Copiar legenda'; }, 1800);
       }
     });
   }
 
-  // Baixar todos os slides em sequencia (browser pode pedir permissao
-  // pra "multiplos downloads do site" — clicar Permitir)
-  const SLIDES = ${JSON.stringify(slides.map((s) => slidesDirRel + s))};
-  const dlBtn = document.getElementById('download-all-btn');
-  if (dlBtn) {
-    dlBtn.addEventListener('click', async () => {
-      const orig = dlBtn.textContent;
-      dlBtn.disabled = true;
-      try {
-        for (let i = 0; i < SLIDES.length; i++) {
-          dlBtn.textContent = '⬇ ' + (i + 1) + '/' + SLIDES.length;
-          const a = document.createElement('a');
-          a.href = SLIDES[i];
-          a.download = SLIDES[i].split('/').pop();
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          await new Promise(r => setTimeout(r, 250));
-        }
-        dlBtn.textContent = '✓ ' + SLIDES.length + ' slides baixados';
-        dlBtn.classList.add('btn-ok');
-        setTimeout(() => { dlBtn.textContent = orig; dlBtn.classList.remove('btn-ok'); dlBtn.disabled = false; }, 2400);
-      } catch (e) {
-        dlBtn.textContent = '⚠ Erro — tenta de novo';
-        setTimeout(() => { dlBtn.textContent = orig; dlBtn.disabled = false; }, 2400);
-      }
+  // Baixar legenda como .txt via Blob URL (funciona em file:// origin,
+  // diferente do <a href download> direto que o browser ignora).
+  const dlLegBtn = document.getElementById('download-legenda-btn');
+  if (dlLegBtn && txt) {
+    dlLegBtn.addEventListener('click', () => {
+      const blob = new Blob([txt.textContent || ''], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'legenda.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 200);
+      const orig = dlLegBtn.textContent;
+      dlLegBtn.textContent = '✓ Baixado';
+      dlLegBtn.classList.add('btn-ok');
+      setTimeout(() => { dlLegBtn.textContent = orig; dlLegBtn.classList.remove('btn-ok'); }, 1800);
     });
   }
 </script>
