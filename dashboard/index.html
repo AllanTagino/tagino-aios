@@ -1342,10 +1342,10 @@ if (!DATA.output || DATA.output.length === 0) {
     );
     const a = el("a", {
       class: "row-link",
-      href: fileUrl(o.path),
+      href: fileUrl(o.viewUrl || o.path),
       target: "_blank",
       rel: "noopener",
-      title: "Abrir no explorador local",
+      title: o.viewUrl && o.viewUrl !== o.path ? "Abrir preview" : "Abrir no explorador local",
     });
     a.appendChild(row);
     out.appendChild(a);
