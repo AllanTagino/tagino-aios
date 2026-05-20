@@ -90,6 +90,30 @@ Se o usuário pedir pra guardar, salvar em `marketing/avaliacoes-google/YYYY-MM-
 
 ---
 
+## Refinement chips
+
+Depois de gerar a resposta pra avaliação, listar chips pro usuário ajustar tom antes de publicar. Ver `referencias/refinement-chips.md` pro padrão geral.
+
+Formato:
+
+> **Refinements rápidos** (digita o número ou texto livre):
+>
+> `1` mais empático · `2` mais firme · `3` mais curto · `4` oferece solução concreta · `5` outra abordagem
+
+**Comportamento por número:**
+- `1` → adicionar reconhecimento explícito do que o cliente sentiu, validar antes de explicar
+- `2` → endurecer linguagem em pontos onde empresa não tem culpa, evitar "desculpa" excessivo (sem virar defensivo)
+- `3` → cortar pra 2-3 frases, manter só o essencial
+- `4` → adicionar próximo passo específico ("vamos refazer o pedido sem custo", "envia detalhe no WhatsApp X")
+- `5` → refazer com nova estrutura (ex: começar pela solução em vez de pelo agradecimento)
+- **Texto livre** → custom (ex: "mais empático mas mais curto" = 1 + 3)
+
+**Importante:** chips funcionam **antes** de publicar. Não publicar sem aprovação explícita.
+
+Limite: 3 rounds (resposta a review precisa fechar rápido).
+
+---
+
 ## Regras
 
 - Nunca copiar respostas idênticas pra reviews diferentes. Variar sempre.

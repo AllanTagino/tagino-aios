@@ -238,6 +238,30 @@ Se sim, chamar `/publicar-tema` com o mesmo tema.
 
 ---
 
+## Refinement chips
+
+Depois de gerar o carrossel + legenda, oferecer chips de refinement pro usuário iterar sem reescrever briefing. Ver `referencias/refinement-chips.md` pro padrão geral.
+
+Formato:
+
+> **Refinements rápidos** (digita o número ou texto livre):
+>
+> `1` mais direto · `2` mais emocional · `3` mais curto (menos slides) · `4` mais técnico (mais dado/número) · `5` hook diferente (mantém slides internos) · `6` outra angle (refaz do zero)
+
+**Comportamento por número:**
+- `1` → reescrever copy de cada slide cortando rebuscamento
+- `2` → trocar argumentação por apelo emocional/storytelling, manter estrutura
+- `3` → reduzir pra 3-5 slides cortando o que não é essencial
+- `4` → adicionar dado/número específico em pelo menos 2 slides (busca em `_memoria/empresa.md`)
+- `5` → manter slides 2-N, regerar só Slide 1 (CAPA) com novo título
+- `6` → tratar como novo briefing partindo do mesmo tema mas perspectiva diferente
+- **Texto livre** → combinação custom (ex: "mais direto e mais curto" = 1 + 3)
+- **Combo numérico** (`1 e 3`) → aplica os 2 eixos
+
+Após refinement: re-renderizar PNGs, atualizar legenda se copy mudou substancialmente, listar chips de novo. Limite: 5 rounds.
+
+---
+
 ## Regras
 
 - Sempre ler `identidade/design-guide.md` antes de criar qualquer visual

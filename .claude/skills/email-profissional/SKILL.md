@@ -61,6 +61,28 @@ Deixar o usuário escolher.
 
 ---
 
+## Refinement chips
+
+Depois de gerar o email (ou 2 versões A/B quando assunto delicado), listar chips. Ver `referencias/refinement-chips.md` pro padrão geral.
+
+Formato:
+
+> **Refinements rápidos** (digita o número ou texto livre):
+>
+> `1` mais formal · `2` mais casual · `3` mais curto · `4` CTA mais forte · `5` outra abordagem
+
+**Comportamento por número:**
+- `1` → reescrever com vocabulário formal, "você" em vez de "tu", abrir/fechar mais corporativo
+- `2` → relaxar tom, mais coloquial, abrir com pergunta ou referência informal
+- `3` → cortar pra 3-5 linhas total, sem perder a essência
+- `4` → reescrever pedido em frase imperativa clara com prazo se aplicável
+- `5` → refazer com estrutura diferente (ex: 3 parágrafos vira bullet list)
+- **Texto livre** → custom
+
+Limite: 4 rounds.
+
+---
+
 ## Regras
 
 - Tom segue `_memoria/preferencias.md`
