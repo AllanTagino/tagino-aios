@@ -104,23 +104,103 @@ Guardar como `ENTREVISTA` pra usar nas próximas fases.
 
 ---
 
-## Fase 2 — Enriquecimento via WebFetch (se --site)
+## Fase 2 — Enriquecimento via multi-source brand research (se --site)
 
-Se `--site <url>` foi passado, usar o tool **WebFetch** nativo com prompt:
+Se `--site <url>` foi passado, fazer **research paralelo em 4 fontes** + síntese.
 
-> "Extraia dessa página de negócio: (1) descrição do que a empresa faz em 1
-> frase, (2) perfil de cliente (quem eles atendem), (3) tom de voz percebido
-> (formal/informal, técnico/leigo), (4) cores principais visíveis no design
-> (hex se conseguir, ou descrição), (5) tipografia se identificável,
-> (6) contato (email, telefone, WhatsApp, endereço) se houver. Responda em
-> JSON com chaves: oferta, cliente_perfil, tom, cores, fontes, contato."
+Inspirado pelo `aiAnalyzeBrandUrl` do [creator-ai-app](https://github.com/AllanTagino/creator-ai-app) — substituiu o single-fetch anterior por uma pipeline que captura significativamente mais sinal sobre a marca.
 
-Guardar como `SITE_INFO`. Se WebFetch falhar (404, timeout, CORS), continuar
-sem enriquecimento e avisar no resumo final.
+### 2.1 — Identificar as 4 fontes pra pesquisar
 
-**Regra de mesclagem:** o que veio do form **sempre tem prioridade**. Site só
-preenche o que o cliente deixou em branco ou enriquece com contato/cores que
-o cliente não mencionou. Nunca sobrescreve resposta humana.
+A partir do `<url>` passado:
+
+1. **Home page** = `<url>` original
+2. **About/mission pages** — tentar variações comuns em paralelo:
+   - `<url>/sobre`
+   - `<url>/about`
+   - `<url>/about-us`
+   - `<url>/quem-somos`
+   - `<url>/empresa`
+   - `<url>/company`
+   - `<url>/mission`
+   Usar a primeira que retorna 200. Se todas 404, pular essa fonte.
+3. **Wikipedia REST summary** — se a marca tiver nome próprio identificável (extrair do título da home), tentar:
+   - `https://pt.wikipedia.org/api/rest_v1/page/summary/<nome-da-marca>`
+   - Fallback: `https://en.wikipedia.org/api/rest_v1/page/summary/<nome-da-marca>`
+4. **DuckDuckGo instant answer** — `https://api.duckduckgo.com/?q=<nome-da-marca>&format=json&no_html=1`
+   - Boa fonte pra marcas que tem fact box ou descrição curta
+
+### 2.2 — Disparar WebFetch das 4 fontes EM PARALELO
+
+Importante: 4 chamadas WebFetch numa única response (paralelas), não sequenciais. Cada uma com prompt específico:
+
+**Home page WebFetch:**
+> "Extraia dessa home page: (1) descrição em 1 frase do que a empresa faz (procura por hero/header), (2) perfil de cliente sugerido pelo design e copy (formal/casual, premium/popular), (3) tom de voz (vocabulário, jargão usado), (4) cores principais visíveis (hex se conseguir ler de CSS inline ou descrever as cores dominantes), (5) tipografia se identificável (nome de fonte em CSS, ou descrever 'serif elegante' / 'sans bold'), (6) contato (email, telefone, WhatsApp em E.164, endereço, redes sociais). Responda JSON: {oferta, cliente_perfil, tom, cores, fontes, contato, social_links}."
+
+**About page WebFetch (na URL que retornou 200):**
+> "Extraia dessa página About: (1) missão/propósito da empresa, (2) ano de fundação, (3) tamanho da equipe se mencionado, (4) história curta, (5) valores listados, (6) fundadores se nomeados. Responda JSON: {missao, fundacao, tamanho_equipe, historia, valores, fundadores}."
+
+**Wikipedia WebFetch (se tentou):**
+> "Extraia: descrição da empresa, setor, sede, fundação, número de funcionários, fundadores. Responda JSON: {descricao, setor, sede, fundacao, funcionarios, fundadores}."
+> (Se Wikipedia retornar 404 ou disambiguation page, marcar como `null`.)
+
+**DuckDuckGo WebFetch (se tentou):**
+> "Extraia o 'Abstract' e 'AbstractText' do JSON retornado. Se vazio, marcar como `null`. Responda JSON: {abstract, source_url}."
+
+### 2.3 — Sintetizar as 4 fontes em SITE_INFO único
+
+Após as 4 fontes responderem (algumas podem ter falhado — OK), consolidar:
+
+```json
+{
+  "oferta": "<derivada de home.oferta + about.missao + wiki.descricao, escolhendo a mais específica>",
+  "cliente_perfil": "<de home.cliente_perfil>",
+  "tom": "<de home.tom>",
+  "cores": ["<hex>", "<hex>"],
+  "fontes": ["<nome de fonte>"],
+  "contato": {
+    "email": "...",
+    "telefone": "...",
+    "whatsapp": "...",
+    "endereco": "...",
+    "social": ["...", "..."]
+  },
+  "extras": {
+    "missao": "<de about.missao>",
+    "fundacao": "<de about.fundacao ou wiki.fundacao>",
+    "tamanho": "<de about.tamanho_equipe ou wiki.funcionarios>",
+    "historia_curta": "<de about.historia>",
+    "valores": ["<...>"],
+    "fundadores": ["<...>"],
+    "setor": "<de wiki.setor>",
+    "sede": "<de wiki.sede>"
+  },
+  "fontes_consultadas": ["home", "about?", "wikipedia?", "duckduckgo?"],
+  "fontes_falhadas": ["<lista das que retornaram null/erro>"]
+}
+```
+
+Guardar como `SITE_INFO`.
+
+### 2.4 — Regras de fallback
+
+- Se **0 das 4 fontes** retornaram dados úteis → SITE_INFO fica vazio, avisar no resumo final: "Não consegui extrair info do site (provável CORS ou site SPA). Workspace gerado só com dados da entrevista."
+- Se **só Home retornou** → seguir como antes (single-source — graceful degradation pro pattern antigo)
+- Se **About falhou mas Wikipedia tem entry** → priorizar Wikipedia pra missão/história
+- Se múltiplas fontes têm o mesmo campo (ex: missão) → preferir a mais longa/específica
+
+### 2.5 — Regra de mesclagem com a entrevista
+
+**O que veio do form (entrevista do cliente) SEMPRE tem prioridade.** SITE_INFO só:
+- Preenche o que o cliente deixou em branco
+- Adiciona campos que a entrevista não cobre (`extras` — missão, fundação, etc.)
+- Enriquece contato/cores quando o cliente não detalhou
+
+**Nunca sobrescreve resposta humana.** Se cliente disse "atendemos casais 28-40" e site sugere "atendemos PMEs", manter o do cliente.
+
+### 2.6 — Custo
+
+4 WebFetches paralelos ≈ ~5-15s wall-clock (gargalo = mais lento dos 4). ~3-5× input pro Claude na fase de síntese (vira ~$0.05-0.10 por workspace, vs $0.02 anterior). Trivial, ganho de qualidade compensa.
 
 ---
 
