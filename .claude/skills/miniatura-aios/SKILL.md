@@ -113,7 +113,7 @@ marketing/enhanced/miniatura-<slug>-<YYYY-MM-DD>/
 
 ### Passo 6 — Rodar o script
 
-Comando padrão (sempre 16:9 + 4K + sem resize):
+Comando padrão (16:9, 2K por default, sem resize):
 
 ```powershell
 python scripts/nano-banana-enhance.py `
@@ -122,15 +122,17 @@ python scripts/nano-banana-enhance.py `
   --negative-file "marketing/enhanced/miniatura-<slug>-<data>/negative.txt" `
   --output "marketing/enhanced/miniatura-<slug>-<data>/miniatura-<slug>.png" `
   --aspect "16:9" `
-  --resolution "4K" `
+  --resolution "2K" `
   --no-resize
 ```
 
-**Por que sempre `--resolution 4K`**: a 2K os materiais ficam achatados (testado). Custo igual ou marginal, ~$0.09-0.12 por imagem.
+**Por que `--resolution 2K` por default**: balanço custo/qualidade. 2K consome ~18 créditos kie.ai (~$0.09), 4K consome ~24 (~$0.12) — 33% mais caro. Pra preview/iteração e a maioria dos usos (carrossel Instagram, WhatsApp, landing), 2K já dá excelente fidelidade de material. Subir pra 4K só quando for impressão grande ou material super-detalhado (mármore, tecido fino, vidro com reflexo complexo).
 
-**Por que sempre `--no-resize`**: 4K não bate com nosso preset TARGET_2K de resize, então melhor mandar o source intacto e deixar a API decidir.
+**Quando subir pra `--resolution 4K`**: o usuário pediu impressão grande (banner, totem), ou viu na v1 a 2K que ficou material achatado e quer comparar. Custa ~33% mais, demora ~3x mais (60s → 200s+).
 
-Tempo médio: 60-210 segundos (4K demora mais que 2K).
+**Por que sempre `--no-resize`**: o resize default do script só roda em 16:9 + 2K — pra ficar consistente com 4K opt-in, deixamos o resize off e mandamos o source intacto pra API decidir.
+
+Tempo médio: 60-90s a 2K, 180-220s a 4K.
 
 ### Passo 7 — Abrir o resultado e mostrar link clicável
 
@@ -185,7 +187,7 @@ python scripts/nano-banana-enhance.py `
   --prompt "Restore the following elements from the original render in their exact positions and materials: <X>, <Y>, <Z>. Keep the camera, the box framing, the cream background, and everything else exactly as it is. Photoreal miniature scale." `
   --output "marketing/enhanced/miniatura-<slug>-<data>/miniatura-<slug>-v2.png" `
   --aspect "16:9" `
-  --resolution "4K" `
+  --resolution "2K" `
   --no-resize
 ```
 
@@ -217,12 +219,18 @@ Salvar como `<slug>-v2.png` (v3, v4 se precisar) — manter histórico pra compa
 
 ## Configurações finais (sempre)
 
-| Parâmetro | Valor | Por quê |
+| Parâmetro | Valor default | Por quê |
 |---|---|---|
 | `--aspect` | `16:9` | Match renderlab + funciona pra interior e semi-aberto |
-| `--resolution` | `4K` | 2K achata materiais (testado) |
-| `--no-resize` | sempre | 4K não usa nosso preset de resize |
-| `--model` (default) | `nano-banana-pro` | Pro tem fidelidade maior pra preservação |
+| `--resolution` | `2K` | Balanço custo/qualidade — usuário pode pedir `4K` se for pra impressão grande |
+| `--no-resize` | sempre | Manter consistência entre 2K e 4K (resize default só pega 2K+16:9) |
+| `--model` | `nano-banana-pro` | Pro tem fidelidade maior pra preservação |
+
+**Custo de referência:**
+- 2K → ~18 créditos kie.ai (~$0.09), 60-90s render
+- 4K → ~24 créditos (~$0.12), 180-220s render
+
+Pra batch (8-10 imagens dum carrossel): 2K = ~$0.80, 4K = ~$1.10.
 
 ---
 
@@ -231,7 +239,7 @@ Salvar como `<slug>-v2.png` (v3, v4 se precisar) — manter histórico pra compa
 - **Prompt longo prescritivo (>200 palavras)** → drift. Quanto mais detalhe, mais o modelo improvisa.
 - **Pedir pra remover teto** → modelo remove parede e teto juntos, fica vazio.
 - **"Preserve everything"** vago → simplifica móveis. Sempre enumerar.
-- **2K resolution** → materiais achatados (pedra vira parede lisa, fabric vira plástico).
+- **2K em material super-detalhado (mármore com veios finos, tecidos com trama)** → pode achatar. Subir pra 4K resolve. Materiais comuns (madeira, pedra básica, fabric simples) renderizam bem a 2K.
 - **Aspect 1:1** → composição apertada, perde laterais. 16:9 é o ponto certo pra cenários horizontais.
 
 ---
