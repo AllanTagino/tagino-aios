@@ -1,6 +1,6 @@
 # Identidade — Criador Solo
 
-> Identidade visual que rodou em cliente real do Tagino_IOS — criador solo,
+> Identidade visual que rodou em cliente real do Tagino_AIOS — criador solo,
 > marca pessoal, audience-first. Adapta a tua em `identidade/design-guide.md`.
 
 ---

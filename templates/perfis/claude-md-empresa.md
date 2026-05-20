@@ -1,4 +1,4 @@
-# [Nome da Empresa] — Tagino_IOS
+# [Nome da Empresa] — Tagino_AIOS
 
 > Molde do CLAUDE.md aplicado a **empresa estruturada** — setores,
 > processos, várias frentes rodando juntas. O sistema gira em torno

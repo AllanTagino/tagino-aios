@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tagino_IOS — Dashboard</title>
+<title>Tagino_AIOS — Dashboard</title>
 <style>
   /* ─────────── Tokens (neutros do OS; cores de projeto entram no widget Identidade) ─────────── */
   :root {
@@ -768,7 +768,7 @@
   <!-- ────────── Top ────────── -->
   <header class="topbar">
     <div class="brand">
-      <div class="brand-mark">Tagino_IOS<span class="dot">.</span></div>
+      <div class="brand-mark">Tagino_AIOS<span class="dot">.</span></div>
       <div class="brand-sub" id="brand-sub">— sistema operacional do negócio</div>
     </div>
     <div class="topbar-meta">
@@ -916,7 +916,7 @@
   </div>
 
   <footer class="foot">
-    <span>Tagino_IOS · dashboard local</span>
+    <span>Tagino_AIOS · dashboard local</span>
     <span id="foot-date">—</span>
   </footer>
 </div>
@@ -937,7 +937,7 @@ const EMPTY_DATA = {
     profile: "—",
     owner: "—",
     today: new Date().toISOString().slice(0, 10),
-    headline: "Bem-vindo ao Tagino_IOS.",
+    headline: "Bem-vindo ao Tagino_AIOS.",
     lead: "Esse dashboard ainda não foi populado. Rode /instalar pra preencher a memória do workspace, depois /atualizar pra gerar os dados deste painel.",
   },
   setup: [
@@ -1093,7 +1093,7 @@ const EMPTY_DATA = {
     {
       name: "/novo-projeto", folder: "novo-projeto", scope: "local",
       desc: "inicia novo projeto a partir do template",
-      long: "Cria nova frente de trabalho (novo cliente, novo produto, nova campanha) usando o template padrão do Tagino_IOS. Carrega memória + identidade adaptadas ao contexto.",
+      long: "Cria nova frente de trabalho (novo cliente, novo produto, nova campanha) usando o template padrão do Tagino_AIOS. Carrega memória + identidade adaptadas ao contexto.",
       examples: ["novo projeto: cliente X", "iniciar frente Y", "criar pasta pro próximo projeto"],
       output: "Nova pasta de projeto pronta pra uso",
     },

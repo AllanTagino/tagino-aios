@@ -1,8 +1,8 @@
-# Tagino_IOS
+# Tagino_AIOS
 
 > O sistema operacional do seu negócio dentro do Claude Code.
 
-Você acaba de instalar o Tagino_IOS. Em alguns minutos, sua empresa
+Você acaba de instalar o Tagino_AIOS. Em alguns minutos, sua empresa
 tem memória própria, identidade visual aplicada em tudo que o sistema
 gerar, 19 skills prontas pra marketing, SEO, ads, mídia e operação, e
 um dashboard local pra ver o estado do sistema num olhar.
@@ -20,7 +20,7 @@ Dois caminhos. Escolhe o que combina contigo.
 Abre o Claude Code em qualquer pasta e cola:
 
 ```
-Clona o https://github.com/AllanTagino/tagino-ios.git na pasta atual,
+Clona o https://github.com/AllanTagino/tagino-aios.git na pasta atual,
 entra nela e roda o /instalar.
 ```
 
@@ -30,8 +30,8 @@ só responde.
 ### Pelo terminal (mais previsível)
 
 ```
-git clone https://github.com/AllanTagino/tagino-ios.git
-cd Tagino_IOS
+git clone https://github.com/AllanTagino/tagino-aios.git
+cd Tagino_AIOS
 code .
 ```
 
@@ -39,9 +39,9 @@ Na janela do VS Code que abrir: terminal integrado → `claude` → `/instalar`.
 
 ---
 
-Quando o `/instalar` terminar, renomeia a pasta `Tagino_IOS/` pro nome do teu
+Quando o `/instalar` terminar, renomeia a pasta `Tagino_AIOS/` pro nome do teu
 negócio (fecha o VS Code, renomeia no Explorer/Finder, abre de novo). A
-pasta não fica como "Tagino_IOS" — ela é o teu negócio agora.
+pasta não fica como "Tagino_AIOS" — ela é o teu negócio agora.
 
 O `/instalar` roda uma vez só. Te entrevista sobre o negócio, monta a
 memória e configura o sistema. Depois disso, é só usar.
@@ -113,14 +113,14 @@ que ela roda.
 A diferença não é velocidade. É capacidade nova — uma pessoa com IA
 constrói o que antes exigia time inteiro. Cada processo crítico que hoje
 roda em open loop (decide → executa → não mede → repete cego) vira
-closed loop dentro do Tagino_IOS (decide → executa → captura → realimenta →
+closed loop dentro do Tagino_AIOS (decide → executa → captura → realimenta →
 ajusta sozinho).
 
 O sistema não substitui você. Vira parte da sua empresa.
 
 ---
 
-## Como o Tagino_IOS pensa
+## Como o Tagino_AIOS pensa
 
 `_memoria/` é o cérebro. Tudo que importa do seu negócio mora aqui —
 quem é a empresa, como ela fala, o que tá em foco essa semana. O Claude
@@ -136,7 +136,7 @@ versiona no GitHub, fica tudo seu.
 
 ## Entrevista web pra cliente que não usa Claude
 
-Tagino_IOS é o sistema operacional pra quem **vai usar Claude Code**. Pra atender clientes que **não vão usar Claude**, montei uma entrevista web separada que roda em qualquer browser e captura as respostas via Netlify Forms:
+Tagino_AIOS é o sistema operacional pra quem **vai usar Claude Code**. Pra atender clientes que **não vão usar Claude**, montei uma entrevista web separada que roda em qualquer browser e captura as respostas via Netlify Forms:
 
 → Repo do hub: **[tagino-entrevista-hub](https://github.com/AllanTagino/tagino-entrevista-hub)** (privado, é o meu setup)
 

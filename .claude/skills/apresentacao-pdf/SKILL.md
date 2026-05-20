@@ -5,7 +5,7 @@ description: Gera PDF profissional editorial em A4 a partir de markdown, notas s
 
 # /apresentacao-pdf — PDF editorial com a marca
 
-Skill standalone de geração de PDF profissional. **Não depende de outras skills** — funciona pra qualquer usuário do Tagino_IOS, mesmo quem nunca criou site, carrossel ou qualquer outra peça.
+Skill standalone de geração de PDF profissional. **Não depende de outras skills** — funciona pra qualquer usuário do Tagino_AIOS, mesmo quem nunca criou site, carrossel ou qualquer outra peça.
 
 Pipeline: conteúdo (markdown ou estruturado) → HTML estilizado com a identidade da marca → renderiza via Playwright Chromium → PDF A4 pronto pra enviar.
 
@@ -96,7 +96,7 @@ Conforme o template:
 ### Passo 3 · Ler identidade da marca
 
 ```python
-# Lê design-guide.md (padrão Tagino_IOS)
+# Lê design-guide.md (padrão Tagino_AIOS)
 import re
 with open('identidade/design-guide.md', encoding='utf-8') as f:
     brand = f.read()

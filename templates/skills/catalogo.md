@@ -7,35 +7,35 @@ Skills externas prontas pra instalar. Use como referencia ao criar skills novas 
 
 ---
 
-## Skills inclusas no Tagino_IOS (ja vem instaladas)
+## Skills inclusas no Tagino_AIOS (ja vem instaladas)
 
 Quatro skills adicionais bundled neste repo. Funcionam sozinhas, sem dependencia de outras skills.
 
 ### Premium Website (lancamento imobiliario)
 **O que faz:** Gera landing page completa pra lancamento imobiliario em HTML+CSS+JS vanilla. 10 secoes editoriais (hero · sobre · assinatura · galeria · unidades · lazer · localizacao · ficha · contato), Google Maps embed, form que abre WhatsApp, lightbox de galeria, vídeos otimizados. Deploy-ready pra Netlify ou Vercel.
 **Bom pra:** Corretor de imoveis lancando empreendimento novo. Funciona pra Benx, Cyrela, MRV, Gafisa — qualquer construtora.
-**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/premium-website-lancamento-aios`
+**Como instalar:** Ja vem com o Tagino_AIOS. Chamar com `/premium-website-lancamento-aios`
 **Fonte:** Bundled neste repo (`.claude/skills/premium-website-lancamento-aios/`)
 
 ### Transcrever Audio
 **O que faz:** Transcreve audio (MP3, MP4, WAV, M4A) pra texto timecoded em PT-BR usando faster-whisper LOCAL. Sem custo de API, sem upload pra terceiros. Bom pra reels, podcasts, calls.
 **Bom pra:** Extrair fala de qualquer video/audio. Material confidencial (call de cliente, briefing) que nao pode ir pra OpenAI/cloud.
 **Precisa de:** `pip install faster-whisper` (instala na primeira execucao)
-**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/transcrever-audio`
+**Como instalar:** Ja vem com o Tagino_AIOS. Chamar com `/transcrever-audio`
 **Fonte:** Bundled neste repo (`.claude/skills/transcrever-audio/`)
 
 ### Comprimir Video
 **O que faz:** Comprime videos pra web (MP4 H.264 com faststart) via ffmpeg. Aceita 4K HEVC, MOV, MKV. Auto-detecta barras pretas e crop. Perfis pra hero · tour · background · social.
 **Bom pra:** Preparar videos pra site, reels, anuncios. Reduz peso 5-20x mantendo qualidade.
 **Precisa de:** ffmpeg instalado (`brew install ffmpeg` no Mac, `winget install ffmpeg` no Windows)
-**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/comprimir-video`
+**Como instalar:** Ja vem com o Tagino_AIOS. Chamar com `/comprimir-video`
 **Fonte:** Bundled neste repo (`.claude/skills/comprimir-video/`)
 
 ### Apresentacao PDF
 **O que faz:** Gera PDF editorial A4 a partir de markdown ou notas. 5 templates (executive summary · case study · brand book · sales deck · relatorio). Usa identidade visual da marca (cores + fontes do `identidade/design-guide.md`) ou defaults editoriais elegantes.
 **Bom pra:** Apresentacoes pra cliente, executive summary, case study, sales deck, brand book, relatorio mensal.
 **Precisa de:** Playwright instalado (`npx playwright install chromium`)
-**Como instalar:** Ja vem com o Tagino_IOS. Chamar com `/apresentacao-pdf`
+**Como instalar:** Ja vem com o Tagino_AIOS. Chamar com `/apresentacao-pdf`
 **Fonte:** Bundled neste repo (`.claude/skills/apresentacao-pdf/`)
 
 ---
@@ -52,13 +52,13 @@ A partir daqui, skills que vem nativo no Claude Code ou que voce instala separad
 **O que faz:** Escreve copy de vendas usando a metodologia de Eugene Schwartz (Breakthrough Advertising). Diagnostica o nivel de consciencia e sofisticacao do mercado antes de gerar qualquer texto.
 **Bom pra:** Landing pages, emails de venda, VSLs, cartas de venda, paginas de captura
 **Como instalar:** Ja vem como skill global. Chamar com `/schwartz-copy`
-**Fonte:** Skill validada pelo Tagino_IOS
+**Fonte:** Skill validada pelo Tagino_AIOS
 
 ### Ogilvy Copy (marca e posicionamento)
 **O que faz:** Gera copy institucional usando a metodologia de David Ogilvy. Pesquisa profunda, big idea, headlines informativas.
 **Bom pra:** Manifestos de marca, campanhas institucionais, taglines, brand voice, posicionamento
 **Como instalar:** Ja vem como skill global. Chamar com `/ogilvy-copy`
-**Fonte:** Skill validada pelo Tagino_IOS
+**Fonte:** Skill validada pelo Tagino_AIOS
 
 ---
 
@@ -127,7 +127,7 @@ A partir daqui, skills que vem nativo no Claude Code ou que voce instala separad
 **Bom pra:** Criar conteudo a partir de videos (carrosseis, newsletters, posts)
 **Precisa de:** yt-dlp instalado (`brew install yt-dlp`)
 **Como instalar:** Ja vem como skill global. Chamar com `/yt-transcript`
-**Fonte:** Skill validada pelo Tagino_IOS
+**Fonte:** Skill validada pelo Tagino_AIOS
 
 ---
 

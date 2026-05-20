@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Tagino_IOS · build-dashboard
+ * Tagino_AIOS · build-dashboard
  * Scaneia o workspace e gera dashboard/data.js — o arquivo de dados
  * que o dashboard/index.html lê pra mostrar o estado real do projeto.
  *
@@ -45,7 +45,7 @@ const profile =
   matchOne(/Perfil aplicado:\s*([^\n.]+)/i) ||
   "—";
 
-// Owner + headline: o template tem o H1 "Tagino_IOS — Sistema operacional do negócio";
+// Owner + headline: o template tem o H1 "Tagino_AIOS — Sistema operacional do negócio";
 // o /instalar adiciona um segundo H1 com nome do usuário/projeto. Pegar esse segundo.
 let owner = "—";
 let userHeading = "";
@@ -88,7 +88,7 @@ if (!lead) {
     "Esse workspace é seu sistema operacional. Memória, identidade, skills e produção em um só lugar. Rode /instalar pra começar.";
 }
 
-// Headline: tirar a parte do "Tagino_IOS · " e ficar com o contexto significativo
+// Headline: tirar a parte do "Tagino_AIOS · " e ficar com o contexto significativo
 let headline = "";
 if (userHeading) {
   const parts = userHeading.split(/\s+—\s+/);

@@ -1,4 +1,4 @@
-# [Seu Nome] — Tagino_IOS
+# [Seu Nome] — Tagino_AIOS
 
 > Molde do CLAUDE.md aplicado a **freelancer** — você vende tempo e
 > talento pra clientes terceiros. O sistema gira em torno de captar,

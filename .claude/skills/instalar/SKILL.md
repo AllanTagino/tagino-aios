@@ -1,14 +1,14 @@
 ---
 name: instalar
 description: >
-  Instala o Tagino_IOS no negócio do usuário. Entrevista sobre empresa, tom de voz,
+  Instala o Tagino_AIOS no negócio do usuário. Entrevista sobre empresa, tom de voz,
   foco atual e identidade visual, e preenche `_memoria/empresa.md`, `_memoria/preferencias.md`,
   `_memoria/estrategia.md`, `identidade/design-guide.md` e adapta o `CLAUDE.md` conforme o perfil.
   Use quando o usuário acabou de clonar o repositório e quer instalar o sistema, ou quando
-  pedir explicitamente "rodar /instalar", "instalar o Tagino_IOS", "primeiro setup".
+  pedir explicitamente "rodar /instalar", "instalar o Tagino_AIOS", "primeiro setup".
 ---
 
-# /instalar — Instalação inicial do Tagino_IOS
+# /instalar — Instalação inicial do Tagino_AIOS
 
 Esse é o primeiro comando que o usuário roda depois de clonar o repositório. Não pode falhar e não pode soar burocrático. Trata como conversa de descoberta — pergunta uma coisa por vez, escuta de verdade, não enfileira tudo. O objetivo é o sistema sair daqui sabendo quem é a empresa, como ela fala, e onde tá o atrito do dia a dia.
 
@@ -16,9 +16,9 @@ Esse é o primeiro comando que o usuário roda depois de clonar o repositório. 
 
 ### 1. Nome da pasta
 
-Conferir o nome da pasta atual (`basename "$(pwd)"`). Se for `tagino_ios`, `Tagino_IOS`, `Tagino_IOS-main`, `tagino_ios-main` ou variação genérica:
+Conferir o nome da pasta atual (`basename "$(pwd)"`). Se for `tagino_aios`, `Tagino_AIOS`, `Tagino_AIOS-main`, `tagino_aios-main` ou variação genérica:
 
-> "Notei que a pasta atual ainda tem nome genérico ('<nome-atual>'). O ideal é a pasta ter o nome do seu negócio, não 'Tagino_IOS'. Quando terminarmos o setup, te lembro de renomear (é rápido — fechar VS Code, renomear a pasta no Finder/Explorer, abrir de novo). Bora seguir?"
+> "Notei que a pasta atual ainda tem nome genérico ('<nome-atual>'). O ideal é a pasta ter o nome do seu negócio, não 'Tagino_AIOS'. Quando terminarmos o setup, te lembro de renomear (é rápido — fechar VS Code, renomear a pasta no Finder/Explorer, abrir de novo). Bora seguir?"
 
 Registrar mentalmente o nome atual pra usar na Fase 5.
 
@@ -144,7 +144,7 @@ Se a pasta já tem nome próprio (não genérico), pular essa fase.
 
 ## Fase 6 — Próximos passos
 
-> "Pronto. O Tagino_IOS já te conhece.
+> "Pronto. O Tagino_AIOS já te conhece.
 >
 > No começo de cada sessão de trabalho, roda `/abrir` — eu carrego tudo
 > que combinamos aqui antes da primeira frase. Quando quiser fazer um

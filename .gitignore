@@ -6,6 +6,12 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Chaves de API e secrets (gravadas pela skill /conectar — NUNCA versionar)
+.env
+.env.local
+.env.*.local
+!.env.example
+
 # Netlify (link com site especifico, nao deve ir pro repo)
 .netlify/
 
