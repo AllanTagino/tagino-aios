@@ -17,6 +17,7 @@ e estiverem preenchidos):
 1. `_memoria/empresa.md` — quem é o usuário, o que faz, como funciona o negócio
 2. `_memoria/preferencias.md` — tom de voz, estilo de escrita, o que evitar
 3. `_memoria/estrategia.md` — foco atual, prioridades, prazos
+4. `decisions/log.md` (se existir e tiver entries) — decisões importantes do negócio em ordem cronológica. Lê pelo menos as 3 mais recentes pra contextualizar mudanças.
 
 Usar essas informações como base pra qualquer resposta ou decisão. Ao
 sugerir prioridades, formatos ou abordagens, considerar o foco atual
@@ -60,6 +61,7 @@ Se sim, identificar onde faz mais sentido salvar:
 - **Sobre o negócio** (clientes, serviços, mercado) → `_memoria/empresa.md`
 - **Sobre preferências e estilo** (tom de voz, formato, o que evitar) → `_memoria/preferencias.md`
 - **Sobre prioridades e foco** (projetos, metas, prazos) → `_memoria/estrategia.md`
+- **Decisão de negócio com trade-off** (paleta, ICP, processo, fornecedor, pricing) → `decisions/log.md` via skill `/decidir`
 - **Regra de comportamento nessa pasta** → próprio `CLAUDE.md`
 
 Salvar com uma linha nova clara, sem reformatar o arquivo inteiro.
